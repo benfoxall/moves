@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>js move</title>
+    <style media="screen">
+      body{font-family: sans-serif}
+    </style>
+  </head>
+  <body>
+    <h1>JS Move</h1>
+
+    <script type="text/javascript">
+
+    /*
+      the api I want
+      timeStore(2, =500)
+
+      .add(x,y)
+
+      .recent(millis)
+        // [x,y,x,y,x,y,x,y]
+
+      .extent(millis)
+        // [x,y,x,y]
+    */
+    // function Store(n, l){
+    //   this._time = new Array(l)
+    //   this._data = []
+    //   for (var i = 0; i < array.length; i++) {
+    //     this._data[i] = new Array(l)
+    //   }
+    //   this.n = n;
+    //   this.i = 0;
+    //
+    // }
+    //
+    // function store(n){
+    //   var times = new Array(l)
+    //   var data = [];
+    //   for (var i = 0; i < n; i++) {
+    //     data[i] = new Array(l)
+    //   }
+    //
+    //   var _ = 0;
+    //
+    //   return {
+    //     add: function(a,b){
+    //       times[_] = window.performance.now();
+    //       for (var i = 0; i < n; i++) {
+    //         data[0][i] = arguments[i];
+    //       }
+    //
+    //       data[1][_] = b;
+    //     },
+    //     recent: function(){
+    //
+    //     }
+    //   }
+    // }
+
+
+    var points = [];
+
+    function trim(){
+      var now = window.performance.now();
+      // s-k-e-t-c-h-y
+      while(points[0] && points[0] < now - 1000){
+        points = points.slice(3)
+      }
+    }
+
+    function bounds(){
+      if(!points.length) {
+        return null
+      }
+
+      var minX, minY, maxX, maxY;
+      minX = maxX = points[1];
+      minY = maxY = points[2];
+
+      for (var i = 3; i < points.length; i+=3) {
+        minX = Math.min(minX, points[i+1])
+        maxX = Math.max(maxX, points[i+1])
+        minY = Math.min(minY, points[i+2])
+        maxY = Math.max(maxY, points[i+2])
+      }
+
+      return [minX, minY, maxX - minX, maxY - minY]
+    }
+
+    // interpolate
+    function c(i, l){
+      // 0 bad
+      // 130 good
+      var h = (1-Math.min(1,Math.max(0, i))) * 130;
+      return 'hsl('+ h +', 100%, ' + (l || 50) + '%)'
+    }
+
+
+    var canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 600;
+    document.body.appendChild(canvas);
+
+    var ctx = canvas.getContext('2d');
+
+    function render(){
+      requestAnimationFrame(render);
+
+      trim(); // less cool to do this here
+
+      ctx.clearRect(0,0,600,600)
+
+      ctx.fillStyle = '#eee';
+      var b = bounds();
+      if(b){
+        // TODO Maths this
+        var h = (b[2] + b[3])/500;
+        ctx.fillStyle = c(h);
+
+        ctx.fillRect.apply(ctx, b)
+
+        document.body.style.backgroundColor = c(h, 80)
+      } else {
+        document.body.style.backgroundColor = c(0, 80)
+      }
+
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1
+      ctx.beginPath();
+      for (var i = 0; i < points.length; i+=3) {
+        ctx.lineTo(points[i+1], points[i+2])
+      }
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+      ctx.lineJoin = 'round'
+      ctx.lineWidth = 5
+      ctx.beginPath();
+      for (var i = 0; i < points.length; i+=3) {
+        ctx.rect(points[i+1]-.5, points[i+2]-.5,1,1)
+
+      }
+      ctx.stroke()
+
+
+    }
+
+    render();
+
+
+    canvas.addEventListener('mousemove', function(e){
+
+      // store.add(e.offsetX, e.offsetY)
+
+      var now = window.performance.now();
+      points.push(now, e.offsetX, e.offsetY);
+      trim();
+
+    }, false);
+
+
+
+    // if (window.DeviceOrientationEvent) {
+    //   window.addEventListener('deviceorientation', function(eventData) {
+    //     var now = window.performance.now();
+    //     points.push(now, eventData.alpha, eventData.beta);
+    //     trim();
+    //   }, false);
+    // } else {
+    //   alert("NO")
+    // }
+
+    </script>
+  </body>
+</html>
