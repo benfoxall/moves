@@ -57,14 +57,11 @@ Store.prototype.extent = function(c) {
 
 Store.prototype.distance = function(i) {
 
-  var ex = this.extent(i);
-
-  var vectors = ex.map(function(e) {
-    return e[1] - e[0];
-  });
-
-  return Math.sqrt(vectors.reduce(function(memo, v) {
-    return Math.pow(v, 2) + memo;
-  },0));
+  return Math.sqrt(
+    this.extent(i)
+      .reduce(function(memo, e) {
+        return Math.pow(e[1] - e[0], 2) + memo;
+      },0)
+  );
 
 };
