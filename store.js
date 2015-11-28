@@ -1,51 +1,51 @@
 function Store(size, n) {
-  this._size = size || 128;
-  this._n = n || 1;
+  this.size = size || 128;
+  this.n = n || 1;
 
-  this._i = 0;
-  this.__data = new Uint8Array(size * n);
+  this.i = 0;
+  this.data = new Uint8Array(size * n);
 
   // count of items stored
-  this._c = 0;
+  this.count = 0;
 }
 
 Store.prototype.add = function(i) {
   if (!Array.isArray(i)) {i = [i];};
 
   // overflow possible
-  this.__data.set(i, this._i * this._n);
+  this.data.set(i, this.i * this.n);
 
   // decrement round (makes scanning easier)
-  this._i = this._i ? this._i - 1 : this._size - 1;
+  this.i = this.i ? this.i - 1 : this.size - 1;
 
-  this._c ++;
+  this.count ++;
 };
 
 Store.prototype.take = function(c, fn) {
-  c = Math.min(c, this._size, this._c);
+  c = Math.min(c, this.size, this.count);
 
   for (var i = 1; i < c + 1; i++) {
-    var idx = ((this._i + i) % this._size) * this._n;
-    var arr = this.__data.subarray(idx, idx + this._n);
+    var idx = ((this.i + i) % this.size) * this.n;
+    var arr = this.data.subarray(idx, idx + this.n);
     fn.apply(this, [].slice.call(arr,0));
   }
 };
 
 Store.prototype.extent = function(c) {
 
-  c = Math.min(c, this._size, this._c);
+  c = Math.min(c, this.size, this.count);
 
-  var _n = this._n;
+  var _n = this.n;
   var min = new Array(_n), max = new Array(_n);
 
   for (var i = 1; i < c + 1; i++) {
-    var idx = ((this._i + i) % this._size) * this._n;
+    var idx = ((this.i + i) % this.size) * this.n;
     for (var j = 0; j < _n; j++) {
       if (i == 1) {
-        min[j] = max[j] = this.__data[idx + j];
+        min[j] = max[j] = this.data[idx + j];
       } else {
-        min[j] = Math.min(min[j], this.__data[idx + j]);
-        max[j] = Math.max(max[j], this.__data[idx + j]);
+        min[j] = Math.min(min[j], this.data[idx + j]);
+        max[j] = Math.max(max[j], this.data[idx + j]);
       }
     }
   }
