@@ -1,21 +1,33 @@
 function Store(size, n) {
-  this._data = [];
-  this._size = size;
+  this._size = size || 128;
   this._n = n || 1;
+
+  this._i = 0;
+  this.__data = new Uint8Array(size * n);
+
+  // count of items stored
+  this._c = 0;
 }
 
 Store.prototype.add = function(i) {
   if(!Array.isArray(i)) i = [i];
 
-  this._data.unshift(i);
-  if (this._data.length > this._size)
-    this._data.pop();
+  // overflow possible
+  this.__data.set(i, this._i * this._n);
+
+  // decrement round (makes scanning easier)
+  this._i = this._i ? this._i - 1 : this._size - 1;
+
+  this._c ++;
 };
 
 Store.prototype.take = function(c, fn) {
-  c = Math.min(c, this._data.length);
-  for (var i = 0; i < c; i++) {
-    fn.apply(this,this._data[i]);
+  c = Math.min(c, this._size, this._c);
+
+  for (var i = 1; i < c+1; i++) {
+    var idx = ((this._i + i) % this._size) * this._n;
+    var arr = this.__data.subarray(idx, idx + this._n);
+    fn.apply(this, [].slice.call(arr,0))
   }
 };
 
