@@ -25,7 +25,7 @@ Store.prototype.take = function(c, fn) {
   c = Math.min(c, this._size, this._c);
 
   for (var i = 1; i < c + 1; i++) {
-    var idx = ((this._i + i) % this._size) * this._n,
+    var idx = ((this._i + i) % this._size) * this._n;
     var arr = this.__data.subarray(idx, idx + this._n);
     fn.apply(this, [].slice.call(arr,0));
   }
