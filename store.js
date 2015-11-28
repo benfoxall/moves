@@ -10,7 +10,7 @@ function Store(size, n) {
 }
 
 Store.prototype.add = function(i) {
-  if(!Array.isArray(i)) i = [i];
+  if (!Array.isArray(i)) {i = [i];};
 
   // overflow possible
   this.__data.set(i, this._i * this._n);
@@ -24,10 +24,10 @@ Store.prototype.add = function(i) {
 Store.prototype.take = function(c, fn) {
   c = Math.min(c, this._size, this._c);
 
-  for (var i = 1; i < c+1; i++) {
-    var idx = ((this._i + i) % this._size) * this._n;
+  for (var i = 1; i < c + 1; i++) {
+    var idx = ((this._i + i) % this._size) * this._n,
     var arr = this.__data.subarray(idx, idx + this._n);
-    fn.apply(this, [].slice.call(arr,0))
+    fn.apply(this, [].slice.call(arr,0));
   }
 };
 
@@ -38,10 +38,10 @@ Store.prototype.extent = function(c) {
   var _n = this._n;
   var min = new Array(_n), max = new Array(_n);
 
-  for (var i = 1; i < c+1; i++) {
+  for (var i = 1; i < c + 1; i++) {
     var idx = ((this._i + i) % this._size) * this._n;
     for (var j = 0; j < _n; j++) {
-      if(i == 1){
+      if (i == 1) {
         min[j] = max[j] = this.__data[idx + j];
       } else {
         min[j] = Math.min(min[j], this.__data[idx + j]);
@@ -50,21 +50,21 @@ Store.prototype.extent = function(c) {
     }
   }
 
-  return min.map(function(min, i){
-    return [min, max[i]]
+  return min.map(function(min, i) {
+    return [min, max[i]];
   });
-}
+};
 
 Store.prototype.distance = function(i) {
 
   var ex = this.extent(i);
 
-  var vectors = ex.map(function(e){
-    return e[1] - e[0]
-  })
+  var vectors = ex.map(function(e) {
+    return e[1] - e[0];
+  });
 
-  return Math.sqrt(vectors.reduce(function(memo, v){
+  return Math.sqrt(vectors.reduce(function(memo, v) {
     return Math.pow(v, 2) + memo;
-  },0))
+  },0));
 
-}
+};
