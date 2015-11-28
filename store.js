@@ -31,16 +31,24 @@ Store.prototype.take = function(c, fn) {
   }
 };
 
-Store.prototype.extent = function(i) {
+Store.prototype.extent = function(c) {
+
+  c = Math.min(c, this._size, this._c);
+
   var _n = this._n;
   var min = new Array(_n), max = new Array(_n);
 
-  this.take(i, function(value){
+  for (var i = 1; i < c+1; i++) {
+    var idx = ((this._i + i) % this._size) * this._n;
     for (var j = 0; j < _n; j++) {
-      min[j] = min[j] ? Math.min(min[j], arguments[j]) : arguments[j];
-      max[j] = max[j] ? Math.max(max[j], arguments[j]) : arguments[j];
+      if(i == 1){
+        min[j] = max[j] = this.__data[idx + j];
+      } else {
+        min[j] = Math.min(min[j], this.__data[idx + j]);
+        max[j] = Math.max(max[j], this.__data[idx + j]);
+      }
     }
-  })
+  }
 
   return min.map(function(min, i){
     return [min, max[i]]
