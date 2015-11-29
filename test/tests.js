@@ -144,7 +144,7 @@ describe('TimeStore', function() {
     })
 
     beforeEach(function() {
-      store = new TimeStore(5, 1);
+      store = new TimeStore();
       store.add(5);
       store.add(6);
       clock.tick(5000);
@@ -159,7 +159,7 @@ describe('TimeStore', function() {
 
       expect(store.extent(0)).to.eql([[9,10]]);
       expect(store.extent(5000)).to.eql([[7,10]]);
-      expect(store.extent(10000)).to.eql([[6,10]]);
+      expect(store.extent(10000)).to.eql([[5,10]]);
 
     });
 
@@ -167,7 +167,7 @@ describe('TimeStore', function() {
 
       expect(store.distance(0)).to.eql(1);
       expect(store.distance(5000)).to.eql(3);
-      expect(store.distance(10000)).to.eql(4);
+      expect(store.distance(10000)).to.eql(5);
 
     });
 
@@ -184,7 +184,7 @@ describe('TimeStore', function() {
     })
 
     beforeEach(function() {
-      store = new TimeStore(5, 2);
+      store = new TimeStore(2);
       store.add(5,5);
       store.add(6,6);
       clock.tick(5000);
@@ -199,7 +199,7 @@ describe('TimeStore', function() {
 
       expect(store.extent(0)).to.eql([[9,10],[9,10]]);
       expect(store.extent(5000)).to.eql([[7,10],[7,10]]);
-      expect(store.extent(10000)).to.eql([[6,10],[6,10]]);
+      expect(store.extent(10000)).to.eql([[5,10],[5,10]]);
 
     });
 
@@ -207,7 +207,7 @@ describe('TimeStore', function() {
 
       expect(store.distance(0)).to.eql(Math.sqrt(2));
       expect(store.distance(5000)).to.eql(Math.sqrt(9 + 9));
-      expect(store.distance(10000)).to.eql(Math.sqrt(16 + 16));
+      expect(store.distance(10000)).to.eql(Math.sqrt(25 + 25));
 
     });
 

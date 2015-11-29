@@ -1,8 +1,8 @@
-function TimeStore(size, n){
+function TimeStore(n){
   this.n = n || 1;
-  this.size = size || 200;
+  this.size = 512;
   this.data = new Int32Array(this.size * this.n);
-  this.deltas = new Uint16Array(this.size); // max 32s
+  this.deltas = new Uint32Array(this.size);
   this.idx = 0;
   this.count = 0;
   this.last = this.now();
