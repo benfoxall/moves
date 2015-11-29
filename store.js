@@ -28,6 +28,29 @@ TimeStore.prototype.add = function(){
   this.last = now;
 }
 
+TimeStore.prototype.each = function(milliseconds, fn){
+  milliseconds -= (this.now() - this.last);
+
+  var args = new Array(this.n);
+
+  var offset = 0, offsetMax = Math.min(this.count, this.size);
+  while(offset < offsetMax){
+    if(milliseconds<0) break;
+
+    var i = (this.idx + offset) % this.size;
+
+    for (var j = 0; j < this.n; j++) {
+      args[j] = this.data[(i*this.n) + j];
+    }
+
+    fn.apply(null, args);
+
+    milliseconds -= this.deltas[i];
+    offset++;
+  }
+}
+
+
 TimeStore.prototype.extent = function(milliseconds){
   milliseconds -= (this.now() - this.last);
 

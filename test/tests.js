@@ -171,6 +171,21 @@ describe('TimeStore', function() {
 
     });
 
+    it('gives a callback for iterating through points', function() {
+
+      var fn = sinon.spy();
+
+      store.each(5000, fn);
+
+      expect(fn.callCount).to.eql(4)
+
+      expect(fn.getCall(0).args).to.eql([10])
+      expect(fn.getCall(1).args).to.eql([9])
+      expect(fn.getCall(2).args).to.eql([8])
+      expect(fn.getCall(3).args).to.eql([7])
+
+    });
+
   });
 
 
