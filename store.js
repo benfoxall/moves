@@ -2,7 +2,7 @@ function TimeStore(size, n){
   this.n = n || 1;
   this.size = size || 200;
   this.data = new Int32Array(this.size * this.n);
-  this.deltas = new Uint16Array(this.size);
+  this.deltas = new Uint16Array(this.size); // max 32s
   this.idx = 0;
   this.count = 0;
   this.last = this.now();
@@ -17,7 +17,7 @@ TimeStore.prototype.add = function(){
   this.idx = (this.idx || this.size) - 1;
 
   for (var i = 0; i < this.n; i++)
-    this.data[this.idx + i] = arguments[i];
+    this.data[(this.idx*this.n) + i] = arguments[i];
 
   this.count ++;
 
@@ -31,21 +31,26 @@ TimeStore.prototype.add = function(){
 TimeStore.prototype.extent = function(milliseconds){
   milliseconds -= (this.now() - this.last);
 
-  var min, max, i, v;
+  var min = new Array(this.n), max = new Array(this.n), i, v;
   var offset = 0, offsetMax = Math.min(this.count, this.size);
   while(offset < offsetMax){
     if(milliseconds<0) break;
 
     i = (this.idx + offset) % this.size;
-    v = this.data[i]
-    min = offset ? Math.min(min, v) : v;
-    max = offset ? Math.max(max, v) : v;
+
+    for (var j = 0; j < this.n; j++) {
+      v = this.data[(i*this.n) + j];
+      min[j] = offset ? Math.min(min[j], v) : v;
+      max[j] = offset ? Math.max(max[j], v) : v;
+    }
 
     milliseconds -= this.deltas[i];
     offset++;
   }
 
-  return [[min, max]]
+  return min.map(function(min, i) {
+    return [min, max[i]];
+  });
 }
 
 TimeStore.prototype.distance = function(milliseconds){

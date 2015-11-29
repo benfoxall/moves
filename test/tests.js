@@ -173,4 +173,44 @@ describe('TimeStore', function() {
 
   });
 
+
+  describe('higher dimensions', function() {
+
+    beforeEach(function(){
+      clock = sinon.useFakeTimers();
+    })
+    afterEach(function(){
+      clock.restore()
+    })
+
+    beforeEach(function() {
+      store = new TimeStore(5, 2);
+      store.add(5,5);
+      store.add(6,6);
+      clock.tick(5000);
+      store.add(7,7);
+      store.add(8,8);
+      clock.tick(5000);
+      store.add(9,9);
+      store.add(10,10);
+    });
+
+    it('gives the extent covered on different timespans', function() {
+
+      expect(store.extent(0)).to.eql([[9,10],[9,10]]);
+      expect(store.extent(5000)).to.eql([[7,10],[7,10]]);
+      expect(store.extent(10000)).to.eql([[6,10],[6,10]]);
+
+    });
+
+    it('gives the distance covered over different timespans', function() {
+
+      expect(store.distance(0)).to.eql(Math.sqrt(2));
+      expect(store.distance(5000)).to.eql(Math.sqrt(9 + 9));
+      expect(store.distance(10000)).to.eql(Math.sqrt(16 + 16));
+
+    });
+
+  });
+
 });
