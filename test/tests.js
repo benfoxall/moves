@@ -114,3 +114,63 @@ describe('Store', function() {
   });
 
 });
+
+
+
+
+
+describe('TimeStore', function() {
+  function take(i){
+    var items = [];
+
+    store.take(i, function(i) {
+      var args = [].slice.call(arguments);
+      if(args.length === 1) items.push(i)
+      else items.push(args);
+    });
+
+    return items;
+  }
+
+  var store, clock;
+
+  describe('basic functions', function() {
+
+    beforeEach(function(){
+      clock = sinon.useFakeTimers();
+    })
+    afterEach(function(){
+      clock.restore()
+    })
+
+    beforeEach(function() {
+      store = new TimeStore(5, 1);
+      store.add(5);
+      store.add(6);
+      clock.tick(5000);
+      store.add(7);
+      store.add(8);
+      clock.tick(5000);
+      store.add(9);
+      store.add(10);
+    });
+
+    it('gives the extent covered on different timespans', function() {
+
+      expect(store.extent(0)).to.eql([[9,10]]);
+      expect(store.extent(5000)).to.eql([[7,10]]);
+      expect(store.extent(10000)).to.eql([[6,10]]);
+
+    });
+
+    it('gives the distance covered over different timespans', function() {
+
+      expect(store.distance(0)).to.eql(1);
+      expect(store.distance(5000)).to.eql(3);
+      expect(store.distance(10000)).to.eql(4);
+
+    });
+
+  });
+
+});

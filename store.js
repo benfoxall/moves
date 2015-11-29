@@ -1,3 +1,65 @@
+function TimeStore(size, n){
+  this.n = n || 1;
+  this.size = size || 200;
+  this.data = new Int32Array(this.size * this.n);
+  this.deltas = new Uint16Array(this.size);
+  this.idx = 0;
+  this.count = 0;
+  this.last = this.now();
+}
+
+TimeStore.prototype.now = function(){
+  return Date.now();
+}
+
+TimeStore.prototype.add = function(){
+
+  this.idx = (this.idx || this.size) - 1;
+
+  for (var i = 0; i < this.n; i++)
+    this.data[this.idx + i] = arguments[i];
+
+  this.count ++;
+
+  // store the timestamp diff of this event
+  var now = this.now();
+  var delta = now - this.last;
+  this.deltas[this.idx] = delta;
+  this.last = now;
+}
+
+TimeStore.prototype.extent = function(milliseconds){
+  milliseconds -= (this.now() - this.last);
+
+  var min, max, i, v;
+  var offset = 0, offsetMax = Math.min(this.count, this.size);
+  while(offset < offsetMax){
+    if(milliseconds<0) break;
+
+    i = (this.idx + offset) % this.size;
+    v = this.data[i]
+    min = offset ? Math.min(min, v) : v;
+    max = offset ? Math.max(max, v) : v;
+
+    milliseconds -= this.deltas[i];
+    offset++;
+  }
+
+  return [[min, max]]
+}
+
+TimeStore.prototype.distance = function(milliseconds){
+  return Math.sqrt(
+    this.extent(milliseconds)
+      .reduce(function(memo, e) {
+        return Math.pow(e[1] - e[0], 2) + memo;
+      },0)
+  );
+}
+
+
+
+
 function Store(size, n) {
   this.size = size || 128;
   this.n = n || 1;
