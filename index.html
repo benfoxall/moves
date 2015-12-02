@@ -4,77 +4,158 @@
     <meta charset="utf-8">
     <title>js move</title>
     <style media="screen">
-      body{margin: 0}
+      body {margin: 0; text-align: center;}
+      #container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,.8);
+      }
+      button {
+        width: 30vw;
+        height: 20vh;
+        padding: 0;
+        text-align: center;
+        font-size: 2em;
+        border: 0;
+        margin: 0 1em;
+        outline: none;
+        background: #111;
+        color: #fafafa;
+      }
     </style>
   </head>
   <body>
     <script src="store.js"></script>
     <script type="text/javascript">
+      var isThrowable = function () {
+        return window.DeviceOrientationEvent ? true : false;
+      };
 
-    var store = new TimeStore(2);
+      var interpolatedColor = function (i, l){
+        var h = (1-Math.min(1,Math.max(0, i))) * 130;
+        return 'hsl('+ h +', 100%, ' + (l || 50) + '%)'
+      };
 
-    // interpolate colours
-    function c(i, l){
-      var h = (1-Math.min(1,Math.max(0, i))) * 130;
-      return 'hsl('+ h +', 100%, ' + (l || 50) + '%)'
-    }
+      var createRectangle = function (b){
+        return [b[0][0], b[1][0], b[0][1] - b[0][0], b[1][1] - b[1][0]]
+      };
 
-    function rect(b){
-      return [b[0][0], b[1][0], b[0][1] - b[0][0], b[1][1] - b[1][0]]
-    }
+      var timeStoreAmount;
+      var renderCommands;
+      var store;
 
-    var canvas = document.createElement('canvas');
-    document.body.appendChild(canvas);
+      var render = function () {
+        requestAnimationFrame(render);
+        renderCommands(store);
+      };
+      var init = function () {
+        var el = document.getElementById('container');
+        if (el) {
+          el.parentNode.removeChild(el);
+        }
+        store = new TimeStore(timeStoreAmount);
+        render();
+      };
 
-    function resize(){
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
+      var setupWaveMode = function () {
+        // Use device orientation
+        timeStoreAmount = 3;
+        renderCommands = function (store) {
+          var distance = store.distance(1000) / 200;
+          document.body.style.backgroundColor = interpolatedColor(distance);
+        };
 
+        window.addEventListener('deviceorientation', function(eventData){
+          store.add(eventData.gamma, eventData.beta, eventData.alpha);
+        }, false);
+      };
 
-    var ctx = canvas.getContext('2d');
+      var setupTapMode = function () {
+        // Use mouse/touch
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        document.body.appendChild(canvas);
 
-    function render(){
-      requestAnimationFrame(render);
+        timeStoreAmount = 2;
 
-      var b = store.extent(1000);
-      var distance = store.distance(1000) / 500;
+        renderCommands = function (store) {
+          var b = store.extent(1000);
+          var distance = store.distance(1000) / 500;
+          ctx.fillStyle = interpolatedColor(distance, 80);
+          ctx.fillRect(0,0,canvas.width,canvas.height);
+          ctx.fillStyle = interpolatedColor(distance);
+          if (b[0]) {
+            ctx.fillRect.apply(ctx, createRectangle(b));
+          }
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          store.each(1000, function(x, y) {
+            ctx.lineTo(x, y);
+            ctx.arc(x,y,2,0,2*Math.PI);
+            ctx.moveTo(x, y);
+          });
+          ctx.stroke();
+        };
 
-      ctx.fillStyle = c(distance, 80);
-      ctx.fillRect(0,0,canvas.width,canvas.height);
+        var resize = function () {
+          canvas.width  = window.innerWidth;
+          canvas.height = window.innerHeight;
+        };
+        resize();
+        window.addEventListener('resize', resize);
 
-      ctx.fillStyle = c(distance);
-      if(b[0])
-        ctx.fillRect.apply(ctx, rect(b));
+        canvas.addEventListener('mousemove', function(e){
+          store.add(e.offsetX, e.offsetY);
+        }, false);
 
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
+        canvas.addEventListener('touchmove', function(e){
+          e.preventDefault();
+          for (var i = 0; i < e.touches.length; i++) {
+            store.add(e.touches[i].pageX, e.touches[i].pageY);
+          }
+        });
+      };
 
-      ctx.beginPath();
-      store.each(1000, function(x, y) {
-          ctx.lineTo(x, y);
-          ctx.arc(x,y,2,0,2*Math.PI);
-          ctx.moveTo(x, y);
-      })
-      ctx.stroke();
+      var createButtons = function () {
+        if (isThrowable) {
+          var container = document.createElement('div');
+          container.id = 'container';
+          var waveButton = document.createElement('button');
+          waveButton.id = 'throw';
+          waveButton.innerText = 'Wave your device';
+          waveButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            setupWaveMode();
+            init();
+          }, false);
+          container.appendChild(waveButton);
 
-    }
+          var tapButton = document.createElement('button');
+          tapButton.id = 'throw';
+          tapButton.innerText = 'Wave your mouse';
+          tapButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            setupTapMode();
+            init();
+          }, false);
+          container.appendChild(tapButton);
 
-    render();
+          document.body.appendChild(container);
+        } else {
+          setupTapMode();
+          init();
+        }
+      };
 
-    canvas.addEventListener('mousemove', function(e){
-      store.add(e.offsetX, e.offsetY);
-    }, false);
-
-    canvas.addEventListener('touchmove', function(e){
-      e.preventDefault()
-      for (var i = 0; i < e.touches.length; i++) {
-        store.add(e.touches[i].pageX, e.touches[i].pageY);
-      }
-    })
-
+      createButtons();
     </script>
   </body>
 </html>
