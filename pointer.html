@@ -20,7 +20,7 @@
         return [b[0][0], b[1][0], b[0][1] - b[0][0], b[1][1] - b[1][0]]
       };
 
-      var store = new TimeStore(2);
+      var store = new TimeStore(['offsetX', 'offsetY']);
 
       var canvas = document.createElement('canvas');
       var ctx = canvas.getContext('2d');
@@ -64,18 +64,17 @@
       render();
 
 
-      canvas.addEventListener('mousemove', function(e){
-        store.add(e.offsetX, e.offsetY);
-      }, false);
+      canvas.addEventListener('mousemove', store.add.bind(store), false);
 
       canvas.addEventListener('touchmove', function(e){
         e.preventDefault();
         for (var i = 0; i < e.touches.length; i++) {
-          store.add(e.touches[i].pageX, e.touches[i].pageY);
+          store.add({
+            offsetX:e.touches[i].pageX,
+            offsetY:e.touches[i].pageY
+          })
         }
       });
-
-
 
     </script>
   </body>
