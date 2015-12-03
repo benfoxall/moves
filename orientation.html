@@ -14,16 +14,10 @@
 
       var store = new TimeStore(['gamma', 'beta', 'alpha']);
 
-      var interpolatedColor = function (i, l){
-        var h = (1-Math.min(1,Math.max(0, i))) * 130;
-        return 'hsl('+ h +', 100%, ' + (l || 50) + '%)'
-      };
-
       function render () {
-        requestAnimationFrame(render);
 
-        var d = distance(store.extent(1000)) / 500;
-        document.body.style.backgroundColor = interpolatedColor(d);
+        requestAnimationFrame(render);
+        document.body.style.backgroundColor = colour(distance(store.extent(1000)) / 500);
 
       };
       render();
