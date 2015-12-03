@@ -54,7 +54,7 @@ class TimeStore {
     }
   }
 
-  extent(milliseconds) {
+  range(milliseconds) {
     milliseconds -= (this.now() - this.last);
 
     var min = new Array(this.n), max = new Array(this.n), i, v;
@@ -77,6 +77,10 @@ class TimeStore {
     return min.map(function(min, i) {
       return [min, max[i]];
     })
+  }
+
+  extent(milliseconds) {
+    return this.range(milliseconds).map(r => r[1] - r[0])
   }
 
 }

@@ -155,11 +155,19 @@ describe('TimeStore', function() {
       store.add({x:10});
     });
 
+    it('gives the range covered on different timespans', function() {
+
+      expect(store.range(0)).to.eql([[9,10]]);
+      expect(store.range(5000)).to.eql([[7,10]]);
+      expect(store.range(10000)).to.eql([[5,10]]);
+
+    });
+
     it('gives the extent covered on different timespans', function() {
 
-      expect(store.extent(0)).to.eql([[9,10]]);
-      expect(store.extent(5000)).to.eql([[7,10]]);
-      expect(store.extent(10000)).to.eql([[5,10]]);
+      expect(store.extent(0)).to.eql([1]);
+      expect(store.extent(5000)).to.eql([3]);
+      expect(store.extent(10000)).to.eql([5]);
 
     });
 
@@ -202,11 +210,20 @@ describe('TimeStore', function() {
       store.add({x:10,y:10});
     });
 
+    it('gives the range covered on different timespans', function() {
+
+      expect(store.range(0)).to.eql([[9,10],[9,10]]);
+      expect(store.range(5000)).to.eql([[7,10],[7,10]]);
+      expect(store.range(10000)).to.eql([[5,10],[5,10]]);
+
+    });
+
+
     it('gives the extent covered on different timespans', function() {
 
-      expect(store.extent(0)).to.eql([[9,10],[9,10]]);
-      expect(store.extent(5000)).to.eql([[7,10],[7,10]]);
-      expect(store.extent(10000)).to.eql([[5,10],[5,10]]);
+      expect(store.extent(0)).to.eql([1,1]);
+      expect(store.extent(5000)).to.eql([3,3]);
+      expect(store.extent(10000)).to.eql([5,5]);
 
     });
 

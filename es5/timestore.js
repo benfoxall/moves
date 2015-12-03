@@ -66,8 +66,8 @@ var TimeStore = (function () {
       }
     }
   }, {
-    key: "extent",
-    value: function extent(milliseconds) {
+    key: "range",
+    value: function range(milliseconds) {
       milliseconds -= this.now() - this.last;
 
       var min = new Array(this.n),
@@ -93,6 +93,13 @@ var TimeStore = (function () {
 
       return min.map(function (min, i) {
         return [min, max[i]];
+      });
+    }
+  }, {
+    key: "extent",
+    value: function extent(milliseconds) {
+      return this.range(milliseconds).map(function (r) {
+        return r[1] - r[0];
       });
     }
   }]);

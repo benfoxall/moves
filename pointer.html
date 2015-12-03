@@ -37,7 +37,7 @@
       function render () {
         requestAnimationFrame(render);
 
-        var b = store.extent(1000);
+        var b = store.range(1000);
         var d = distance(store.extent(1000)) / 500;
 
         ctx.fillStyle = interpolatedColor(d, 80);
