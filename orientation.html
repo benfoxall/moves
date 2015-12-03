@@ -15,14 +15,16 @@
       var store = new TimeStore(['gamma', 'beta', 'alpha']);
 
       function render () {
-
+        var d = distance(store.extent(1000));
         requestAnimationFrame(render);
-        document.body.style.backgroundColor = colour(distance(store.extent(1000)) / 500);
+        document.body.style.backgroundColor = colour(d/2);
 
       };
       render();
 
-      window.addEventListener('deviceorientation', store.add.bind(store), false);
+      window.addEventListener('deviceorientation', function(e){
+        store.add(wrap(e))
+      }, false);
 
     </script>
   </body>
