@@ -79,28 +79,21 @@ var TimeStore = (function () {
       while (offset < offsetMax) {
         if (milliseconds < 0) break;
 
-        i = (this.idx + offset) % this.size;
+        var _i = (this.idx + offset) % this.size;
 
         for (var j = 0; j < this.n; j++) {
-          v = this.data[i * this.n + j];
+          v = this.data[_i * this.n + j];
           min[j] = offset ? Math.min(min[j], v) : v;
           max[j] = offset ? Math.max(max[j], v) : v;
         }
 
-        milliseconds -= this.deltas[i];
+        milliseconds -= this.deltas[_i];
         offset++;
       }
 
       return min.map(function (min, i) {
         return [min, max[i]];
       });
-    }
-  }, {
-    key: "distance",
-    value: function distance(milliseconds) {
-      return Math.sqrt(this.extent(milliseconds).reduce(function (memo, e) {
-        return Math.pow(e[1] - e[0], 2) + memo;
-      }, 0));
     }
   }]);
 

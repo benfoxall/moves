@@ -9,6 +9,7 @@
   </head>
   <body>
     <script src="es5/timestore.js"></script>
+    <script src="es5/fns.js"></script>
     <script type="text/javascript">
 
       var store = new TimeStore(['gamma', 'beta', 'alpha']);
@@ -21,8 +22,8 @@
       function render () {
         requestAnimationFrame(render);
 
-        var distance = store.distance(1000) / 200;
-        document.body.style.backgroundColor = interpolatedColor(distance);
+        var d = distance(store.extent(1000)) / 500;
+        document.body.style.backgroundColor = interpolatedColor(d);
 
       };
       render();

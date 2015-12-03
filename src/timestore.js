@@ -14,7 +14,7 @@ class TimeStore {
 
   now() {
     return Date.now();
-  };
+  }
 
   add(object) {
 
@@ -32,7 +32,7 @@ class TimeStore {
     var delta = now - this.last;
     this.deltas[this.idx] = delta;
     this.last = now;
-  };
+  }
 
   each(milliseconds, fn) {
     milliseconds -= (this.now() - this.last);
@@ -52,7 +52,7 @@ class TimeStore {
       milliseconds -= this.deltas[i];
       offset++;
     }
-  };
+  }
 
   extent(milliseconds) {
     milliseconds -= (this.now() - this.last);
@@ -62,7 +62,7 @@ class TimeStore {
     while (offset < offsetMax) {
       if (milliseconds < 0) break;
 
-      i = (this.idx + offset) % this.size;
+      let i = (this.idx + offset) % this.size;
 
       for (var j = 0; j < this.n; j++) {
         v = this.data[(i * this.n) + j];
@@ -76,16 +76,7 @@ class TimeStore {
 
     return min.map(function(min, i) {
       return [min, max[i]];
-    });
-  };
-
-  distance(milliseconds) {
-    return Math.sqrt(
-      this.extent(milliseconds)
-        .reduce(function(memo, e) {
-          return Math.pow(e[1] - e[0], 2) + memo;
-        },0)
-    );
-  };
+    })
+  }
 
 }

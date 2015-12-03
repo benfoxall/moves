@@ -9,6 +9,7 @@
   </head>
   <body>
     <script src="es5/timestore.js"></script>
+    <script src="es5/fns.js"></script>
     <script type="text/javascript">
 
       var interpolatedColor = function (i, l){
@@ -37,11 +38,11 @@
         requestAnimationFrame(render);
 
         var b = store.extent(1000);
-        var distance = store.distance(1000) / 500;
+        var d = distance(store.extent(1000)) / 500;
 
-        ctx.fillStyle = interpolatedColor(distance, 80);
+        ctx.fillStyle = interpolatedColor(d, 80);
         ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = interpolatedColor(distance);
+        ctx.fillStyle = interpolatedColor(d);
 
         if (b[0]) {
           ctx.fillRect.apply(ctx, createRectangle(b));

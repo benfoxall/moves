@@ -163,14 +163,6 @@ describe('TimeStore', function() {
 
     });
 
-    it('gives the distance covered over different timespans', function() {
-
-      expect(store.distance(0)).to.eql(1);
-      expect(store.distance(5000)).to.eql(3);
-      expect(store.distance(10000)).to.eql(5);
-
-    });
-
     it('gives a callback for iterating through points', function() {
 
       var fn = sinon.spy();
@@ -218,14 +210,25 @@ describe('TimeStore', function() {
 
     });
 
-    it('gives the distance covered over different timespans', function() {
-
-      expect(store.distance(0)).to.eql(Math.sqrt(2));
-      expect(store.distance(5000)).to.eql(Math.sqrt(9 + 9));
-      expect(store.distance(10000)).to.eql(Math.sqrt(25 + 25));
-
-    });
-
   });
 
 });
+
+
+describe('Distance', function(){
+
+  it('works for single datapoint', function() {
+
+    expect(distance([1])).to.eql(1);
+    expect(distance([3])).to.eql(3);
+    expect(distance([5])).to.eql(5);
+
+  });
+
+
+  it('works for higher dimensions', function() {
+    expect(distance([1,1])).to.eql(Math.sqrt(2));
+    expect(distance([3,3])).to.eql(Math.sqrt(9 + 9));
+    expect(distance([5,5])).to.eql(Math.sqrt(25 + 25));
+  });
+})
