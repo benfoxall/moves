@@ -5,10 +5,11 @@ var _createClass = (function () { function defineProperties(target, props) { for
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var TimeStore = (function () {
-  function TimeStore(n) {
+  function TimeStore(props) {
     _classCallCheck(this, TimeStore);
 
-    this.n = n || 1;
+    this.props = props;
+    this.n = props.length;
     this.size = 512;
     this.data = new Int32Array(this.size * this.n);
     this.deltas = new Uint32Array(this.size);
@@ -24,13 +25,15 @@ var TimeStore = (function () {
     }
   }, {
     key: "add",
-    value: function add() {
+    value: function add(object) {
 
       this.idx = (this.idx || this.size) - 1;
 
-      for (var i = 0; i < this.n; i++) {
-        this.data[this.idx * this.n + i] = arguments[i];
-      }this.count++;
+      this.data.set(this.props.map(function (p) {
+        return object[p];
+      }), this.idx * this.n);
+
+      this.count++;
 
       // store the timestamp diff of this event
       var now = this.now();
@@ -41,6 +44,8 @@ var TimeStore = (function () {
   }, {
     key: "each",
     value: function each(milliseconds, fn) {
+      var _this = this;
+
       milliseconds -= this.now() - this.last;
 
       var args = new Array(this.n);
@@ -52,11 +57,9 @@ var TimeStore = (function () {
 
         var i = (this.idx + offset) % this.size;
 
-        for (var j = 0; j < this.n; j++) {
-          args[j] = this.data[i * this.n + j];
-        }
-
-        fn.apply(null, args);
+        fn.apply(null, this.props.map(function (p, j) {
+          return _this.data[i * _this.n + j];
+        }));
 
         milliseconds -= this.deltas[i];
         offset++;

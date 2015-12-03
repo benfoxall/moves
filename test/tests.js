@@ -144,15 +144,15 @@ describe('TimeStore', function() {
     })
 
     beforeEach(function() {
-      store = new TimeStore();
-      store.add(5);
-      store.add(6);
+      store = new TimeStore(['x']);
+      store.add({x:5});
+      store.add({x:6});
       clock.tick(5000);
-      store.add(7);
-      store.add(8);
+      store.add({x:7});
+      store.add({x:8});
       clock.tick(5000);
-      store.add(9);
-      store.add(10);
+      store.add({x:9});
+      store.add({x:10});
     });
 
     it('gives the extent covered on different timespans', function() {
@@ -199,15 +199,15 @@ describe('TimeStore', function() {
     })
 
     beforeEach(function() {
-      store = new TimeStore(2);
-      store.add(5,5);
-      store.add(6,6);
+      store = new TimeStore(['x', 'y']);
+      store.add({x:5,y:5});
+      store.add({x:6,y:6});
       clock.tick(5000);
-      store.add(7,7);
-      store.add(8,8);
+      store.add({x:7,y:7});
+      store.add({x:8,y:8});
       clock.tick(5000);
-      store.add(9,9);
-      store.add(10,10);
+      store.add({x:9,y:9});
+      store.add({x:10,y:10});
     });
 
     it('gives the extent covered on different timespans', function() {

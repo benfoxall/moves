@@ -1,7 +1,9 @@
+
 class TimeStore {
 
-  constructor(n) {
-    this.n = n || 1;
+  constructor(props) {
+    this.props = props;
+    this.n = props.length;
     this.size = 512;
     this.data = new Int32Array(this.size * this.n);
     this.deltas = new Uint32Array(this.size);
@@ -14,12 +16,14 @@ class TimeStore {
     return Date.now();
   };
 
-  add() {
+  add(object) {
 
     this.idx = (this.idx || this.size) - 1;
 
-    for (var i = 0; i < this.n; i++)
-      this.data[(this.idx * this.n) + i] = arguments[i];
+    this.data.set(
+      this.props.map( p => object[p]),
+      this.idx * this.n
+    )
 
     this.count++;
 
@@ -41,11 +45,9 @@ class TimeStore {
 
       var i = (this.idx + offset) % this.size;
 
-      for (var j = 0; j < this.n; j++) {
-        args[j] = this.data[(i * this.n) + j];
-      }
-
-      fn.apply(null, args);
+      fn.apply(null, this.props.map(
+        (p,j) => this.data[(i * this.n) + j]
+      ));
 
       milliseconds -= this.deltas[i];
       offset++;
@@ -85,6 +87,5 @@ class TimeStore {
         },0)
     );
   };
-
 
 }
