@@ -9,7 +9,8 @@ var distance = function distance(_) {
 };
 
 var colour = function colour(i) {
-  return "rgb(" + Math.floor(i * 255) + ", " + Math.floor((1 - i) * 255) + ", 0)";
+  var a = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+  return "rgba(" + Math.floor(i * 255) + ", " + Math.floor((1 - i) * 255) + ", 0, " + a + ")";
 };
 
 var wrap = function wrap(e) {
