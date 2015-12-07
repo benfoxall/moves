@@ -1,5 +1,46 @@
 var expect = chai.expect;
 
+
+describe('PointStore', function(){
+    "use strict";
+
+    var p1 = new Point(5,0);
+    var p2 = new Point(5,10);
+    var p3 = new Point(15,-10);
+    p2.next = p1;
+    p3.next = p2;
+
+    it('is iterable', function(){
+
+        var fn = sinon.spy();
+
+        for(let p in p3){
+            fn(p)
+        }
+
+        expect(fn.callCount).to.eql(3)
+
+        expect(fn.calledWith(p1))
+        expect(fn.calledWith(p2))
+        expect(fn.calledWith(p3))
+
+    })
+
+    it('calculates range of all points', function() {
+
+        expect(p3.range())
+            .to.eql([
+                5, 15, -10, 10
+            ])
+
+        expect(p2.range())
+            .to.eql([
+                5, 5, 0, 10
+            ])
+    })
+
+})
+
 describe('Store', function() {
   function take(i){
     var items = [];
