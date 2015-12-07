@@ -27,32 +27,33 @@
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-    <code><pre>let points = new Store(‘clientX’, ‘clientY’);
-
-document.addEventListener(‘mousemove’, points.add, false)
-
-// later, we can find the distance covered over the last 1.5s
-points.extent(1500)</pre></code>
+    <code><pre>// current = <span data-key="move-current">{x: , y: , time: }</span></pre></code>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
 
-<code><pre>A = Math.sqrt(
-	Math.pow(<span id="outputX"></span>, 2) +
-	Math.pow(<span id="outputY"></span>, 2)
-) // <span id="outputDistance">0</span>px
-</pre></code>
+<code><pre>
+if(past != last)
+  drawPoints(last)
+  /*
+  <div data-key="move-list">
+      <canvas height="400" width="300"></canvas>
+  </div>
+  */</pre></code>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
 
-
-    <code id="outputSpeed"></code>
+    <div data-key="move-graph">
+        <canvas height="400" width="300"></canvas>
+    </div>
 
     <h2>Colours</h2>
 
+    <section data-key="colour-bg">
+
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
 
-<code><pre>norm = d => Math.max(1, d/100)
+<code data-key="colour-data"><pre>norm = d => Math.max(1, d/100)
   // 0.3365
 
 colour = i => `rgb(${i * 255}, ${1-i * 255}, 255)`
@@ -63,24 +64,59 @@ colour = i => `rgb(${i * 255}, ${1-i * 255}, 255)`
 
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    </section>
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <hr />
 
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
+    <code><pre data-key="orientation-point">{
+	gamma: …
+	alpha: …
+	beta: …
+}</pre></code>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est alaborum.</p>
+
+
+    <div data-key="orientation-graph">
+        <canvas height="400" width="300"></canvas>
+    </div>
+
+
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+    <code><pre  data-key="state-buttons">const READY = 1, STARTED = 2, LOST = 4
+let state = <span id="_state_value">READY</span>
+
+<button id="_state_start">start</button>
+let start => () => {
+  if(state &amp; READY | LOST) {
+    removeButton()
+    state = STARTED
+  }
+}
+<button id="_state_lose">lose</button>
+let lose => () => {
+  if(state &amp; STARTED) {
+    showButton()
+    state = LOST
+  }
+}
+</pre>
 
 
-<script src="es5/timestore.js"></script>
-<script src="es5/fns.js"></script>
-<script type="text/javascript">
+<script src="es5/polyfill.js"></script>
+<script src="es5/story.js"></script>
+
+
+<!--script src="es5/timestore.js"></script-->
+<!--script src="es5/fns.js"></script-->
+<!--script src="es5/story.js"></script-->
+<!--script type="text/javascript">
 
   var pointstore = new TimeStore(['pageX', 'pageY']);
 
@@ -150,6 +186,7 @@ colour = i => `rgb(${i * 255}, ${1-i * 255}, 255)`
     }
   });
 
-</script>
+</script-->
+
   </body>
 </html>
