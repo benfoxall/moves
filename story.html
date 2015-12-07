@@ -13,12 +13,6 @@
         font-family: monospace;
         margin:2em
       }
-      canvas {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: -1
-      }
     </style>
   </head>
   <body>
@@ -27,7 +21,7 @@
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-    <code><pre>// current = <span data-key="move-current">{x: , y: , time: }</span></pre></code>
+    <code><pre>// current = <span data-key="move_current">{x: , y: , time: }</span></pre></code>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
@@ -36,24 +30,24 @@
 if(past != last)
   drawPoints(last)
   /*
-  <div data-key="move-list">
+  <div data-key="move_list">
       <canvas height="400" width="300"></canvas>
   </div>
   */</pre></code>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
 
-    <div data-key="move-graph">
+    <div data-key="move_graph">
         <canvas height="400" width="300"></canvas>
     </div>
 
     <h2>Colours</h2>
 
-    <section data-key="colour-bg">
+    <section data-key="colour_bg">
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
 
-<code data-key="colour-data"><pre>norm = d => Math.max(1, d/100)
+<code data-key="colour_data"><pre>norm = d => Math.max(1, d/100)
   // 0.3365
 
 colour = i => `rgb(${i * 255}, ${1-i * 255}, 255)`
@@ -71,7 +65,7 @@ colour = i => `rgb(${i * 255}, ${1-i * 255}, 255)`
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-    <code><pre data-key="orientation-point">{
+    <code><pre data-key="orientation_point">{
 	gamma: …
 	alpha: …
 	beta: …
@@ -80,7 +74,7 @@ colour = i => `rgb(${i * 255}, ${1-i * 255}, 255)`
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est alaborum.</p>
 
 
-    <div data-key="orientation-graph">
+    <div data-key="orientation_graph">
         <canvas height="400" width="300"></canvas>
     </div>
 
@@ -89,7 +83,7 @@ colour = i => `rgb(${i * 255}, ${1-i * 255}, 255)`
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-    <code><pre  data-key="state-buttons">const READY = 1, STARTED = 2, LOST = 4
+    <code><pre  data-key="state_buttons">const READY = 1, STARTED = 2, LOST = 4
 let state = <span id="_state_value">READY</span>
 
 <button id="_state_start">start</button>
