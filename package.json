@@ -5,7 +5,8 @@
   "scripts": {
     "test": "karma start test/karma.ci.conf",
     "build": "babel -d es5 src",
-    "watch": "babel -d es5 src -w"
+    "watch": "babel -d es5 src -w",
+    "polyfill": "cp node_modules/babel-polyfill/dist/polyfill.js es5/polyfill.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,11 @@
     "karma-sauce-launcher": "^0.3.0"
   },
   "babel": {
-    "presets": ["es2015"]
+    "presets": [
+      "es2015"
+    ]
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.3.14"
   }
 }
