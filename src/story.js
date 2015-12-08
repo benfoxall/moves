@@ -95,94 +95,130 @@ let distance = (range) =>
 
 let implementation = {};
 
-let move_current_last;
-implementation.move_current = (t, element) => {
-    if(move_current_last !== current){
-        element.innerText = JSON.stringify(current)
-        move_current_last = current
+class MoveCurrent {
+    constructor(element) {
+        this.element = element;
     }
-}
 
-
-// class MoveList(){
-//     constructor(element){
-//         this.canvas = element.querySelector('canvas');
-//         this.ctx = canvas.getContext('2d');
-//
-//         this.past = this.last = this.first = null;
-//
-//         this.timer = null;
-//     }
-//
-//     render(timestamp){
-//         clearTimeout(this.timer);
-//
-//         this.timer = setTimeout()
-//     }
-// }
-
-
-
-// VERY TODO: reliquish these
-let past, last, first;
-
-implementation.move_list = (timestamp, element) => {
-    if (!current) return
-
-    last = past
-
-    if (!past) past = current
-
-    // traverse forward in time until we are
-    // within 1.5 seconds of now
-    for(past of points(past))
-      if(past.timestamp > timestamp - 1500)
-        break
-
-    if(past != last || first != current){
-        first = current
-
-        let canvas = element.querySelector('canvas');
-        let ctx = canvas.getContext('2d');
-
-        let r = range(points(past))
-        let e = extent(r)
-        let d = distance(e)
-        // console.log(r,e,d)
-
-        var w = canvas.width, h = canvas.height;
-
-        let s = Math.min(w / e.x , h / e.y, 2.5);
-
-        let tx = -r.x.min - (e.x/2);
-        let ty = -r.y.min - (e.y/2);
-
-
-        ctx.clearRect(0,0, canvas.width, canvas.height)
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = '#08f'
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.save();
-
-        ctx.translate(w/2, h/2)
-        ctx.scale(s,s);
-
-        ctx.translate(tx, ty);
-
-
-        ctx.beginPath();
-        for(let p of points(past)){
-            ctx.lineTo(p.x, p.y)
+    render(timestamp) {
+        if(this.last !== current){
+            this.element.textContent = JSON.stringify(current)
+            this.last = current
         }
-        ctx.stroke();
 
-        ctx.restore();
+    }
+}
+
+implementation.move_current = el => new MoveCurrent(el);
+
+
+
+
+
+class MoveList {
+
+    constructor(element) {
+        this.awake = false;
+
+        this.canvas = element.querySelector('canvas');
+        this.ctx = this.canvas.getContext('2d');
+
+    }
+
+    render(timestamp) {
+        if(!this.awake) this.wake();
+        this.touch = timestamp || window.performance.now();
+
+
+        // The actual stuff
+        if (!current) return
+
+        this.last = this.past
+
+        if (!this.past) this.past = current
+
+        // traverse forward in time until we are
+        // within 1.5 seconds of now
+        for(this.past of points(this.past))
+          if(this.past.timestamp > timestamp - 1500)
+            break
+
+        if(this.past != this.last || this.first != current){
+            this.first = current
+
+        // end of actual stuff
+
+            // let canvas = element.querySelector('canvas');
+            // let ctx = canvas.getContext('2d');
+
+            let r = range(points(this.past))
+            let e = extent(r)
+            let d = distance(e)
+            // console.log(r,e,d)
+
+            let canvas = this.canvas;
+            let ctx = this.ctx;
+
+            var w = canvas.width, h = canvas.height;
+
+            let s = Math.min(w / e.x , h / e.y, 2.5);
+
+            let tx = -r.x.min - (e.x/2);
+            let ty = -r.y.min - (e.y/2);
+
+
+            ctx.clearRect(0,0, canvas.width, canvas.height)
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#08f'
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.save();
+
+            ctx.translate(w/2, h/2)
+            ctx.scale(s,s);
+
+            ctx.translate(tx, ty);
+
+
+            ctx.beginPath();
+            for(let p of points(this.past)){
+                ctx.lineTo(p.x, p.y)
+            }
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+
+
+    }
+
+    sleep(){
+        this.past = this.last = this.first = null;
+        this.awake = false;
+        this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height)
+    }
+    wake(){
+        this.past = this.last = this.first = null;
+
+        // start waiting to go to sleep
+        let check = () => {
+            if(this.touch + 1000 < window.performance.now()) {
+                this.sleep();
+            } else {
+                setTimeout(check, 1000)
+            }
+        }
+        setTimeout(check, 1000);
+
+        this.awake = true;
+
     }
 
 }
 
 
+implementation.move_list = el => new MoveList(el);
 
 // Hook into the sections of the page, only firing implementations when visible
 
@@ -190,7 +226,7 @@ const sections = Array.from(document.querySelectorAll('[data-key]'))
     .map( e => ({
         element: e,
         key: e.dataset.key,
-        fn: implementation[e.dataset.key]
+        fn: implementation[e.dataset.key] && implementation[e.dataset.key](e)
     }));
 
 
@@ -252,7 +288,7 @@ function render(t){
     updateActive();
 
     active.forEach( s => {
-        if(s.fn) s.fn.call(null, t, s.element)
+        if(s.fn) s.fn.render(t, s.element)
     })
 
 

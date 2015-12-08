@@ -1,5 +1,7 @@
 'use strict';
 
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 var _marked = [points].map(regeneratorRuntime.mark);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -127,131 +129,180 @@ var distance = function distance(range) {
 
 var implementation = {};
 
-var move_current_last = undefined;
-implementation.move_current = function (t, element) {
-    if (move_current_last !== current) {
-        element.innerText = JSON.stringify(current);
-        move_current_last = current;
+var MoveCurrent = (function () {
+    function MoveCurrent(element) {
+        _classCallCheck(this, MoveCurrent);
+
+        this.element = element;
     }
+
+    _createClass(MoveCurrent, [{
+        key: 'render',
+        value: function render(timestamp) {
+            if (this.last !== current) {
+                this.element.textContent = JSON.stringify(current);
+                this.last = current;
+            }
+        }
+    }]);
+
+    return MoveCurrent;
+})();
+
+implementation.move_current = function (el) {
+    return new MoveCurrent(el);
 };
 
-// class MoveList(){
-//     constructor(element){
-//         this.canvas = element.querySelector('canvas');
-//         this.ctx = canvas.getContext('2d');
-//
-//         this.past = this.last = this.first = null;
-//
-//         this.timer = null;
-//     }
-//
-//     render(timestamp){
-//         clearTimeout(this.timer);
-//
-//         this.timer = setTimeout()
-//     }
-// }
+var MoveList = (function () {
+    function MoveList(element) {
+        _classCallCheck(this, MoveList);
 
-// VERY TODO: reliquish these
-var past = undefined,
-    last = undefined,
-    first = undefined;
+        this.awake = false;
 
-implementation.move_list = function (timestamp, element) {
-    if (!current) return;
-
-    last = past;
-
-    if (!past) past = current;
-
-    // traverse forward in time until we are
-    // within 1.5 seconds of now
-    var _iteratorNormalCompletion2 = true;
-    var _didIteratorError2 = false;
-    var _iteratorError2 = undefined;
-
-    try {
-        for (var _iterator2 = points(past)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            past = _step2.value;
-
-            if (past.timestamp > timestamp - 1500) break;
-        }
-    } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-    } finally {
-        try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                _iterator2.return();
-            }
-        } finally {
-            if (_didIteratorError2) {
-                throw _iteratorError2;
-            }
-        }
+        this.canvas = element.querySelector('canvas');
+        this.ctx = this.canvas.getContext('2d');
     }
 
-    if (past != last || first != current) {
-        first = current;
+    _createClass(MoveList, [{
+        key: 'render',
+        value: function render(timestamp) {
+            if (!this.awake) this.wake();
+            this.touch = timestamp || window.performance.now();
 
-        var canvas = element.querySelector('canvas');
-        var ctx = canvas.getContext('2d');
+            // The actual stuff
+            if (!current) return;
 
-        var r = range(points(past));
-        var e = extent(r);
-        var d = distance(e);
-        // console.log(r,e,d)
+            this.last = this.past;
 
-        var w = canvas.width,
-            h = canvas.height;
+            if (!this.past) this.past = current;
 
-        var s = Math.min(w / e.x, h / e.y, 2.5);
+            // traverse forward in time until we are
+            // within 1.5 seconds of now
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
-        var tx = -r.x.min - e.x / 2;
-        var ty = -r.y.min - e.y / 2;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = '#08f';
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.save();
-
-        ctx.translate(w / 2, h / 2);
-        ctx.scale(s, s);
-
-        ctx.translate(tx, ty);
-
-        ctx.beginPath();
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
-
-        try {
-            for (var _iterator3 = points(past)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                var p = _step3.value;
-
-                ctx.lineTo(p.x, p.y);
-            }
-        } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
-        } finally {
             try {
-                if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                    _iterator3.return();
+                for (var _iterator2 = points(this.past)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    this.past = _step2.value;
+
+                    if (this.past.timestamp > timestamp - 1500) break;
                 }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
             } finally {
-                if (_didIteratorError3) {
-                    throw _iteratorError3;
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
                 }
             }
+
+            if (this.past != this.last || this.first != current) {
+                this.first = current;
+
+                // end of actual stuff
+
+                // let canvas = element.querySelector('canvas');
+                // let ctx = canvas.getContext('2d');
+
+                var r = range(points(this.past));
+                var e = extent(r);
+                var d = distance(e);
+                // console.log(r,e,d)
+
+                var canvas = this.canvas;
+                var ctx = this.ctx;
+
+                var w = canvas.width,
+                    h = canvas.height;
+
+                var s = Math.min(w / e.x, h / e.y, 2.5);
+
+                var tx = -r.x.min - e.x / 2;
+                var ty = -r.y.min - e.y / 2;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#08f';
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+                ctx.save();
+
+                ctx.translate(w / 2, h / 2);
+                ctx.scale(s, s);
+
+                ctx.translate(tx, ty);
+
+                ctx.beginPath();
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
+
+                try {
+                    for (var _iterator3 = points(this.past)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var p = _step3.value;
+
+                        ctx.lineTo(p.x, p.y);
+                    }
+                } catch (err) {
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                            _iterator3.return();
+                        }
+                    } finally {
+                        if (_didIteratorError3) {
+                            throw _iteratorError3;
+                        }
+                    }
+                }
+
+                ctx.stroke();
+
+                ctx.restore();
+            }
         }
+    }, {
+        key: 'sleep',
+        value: function sleep() {
+            this.past = this.last = this.first = null;
+            this.awake = false;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    }, {
+        key: 'wake',
+        value: function wake() {
+            var _this = this;
 
-        ctx.stroke();
+            this.past = this.last = this.first = null;
 
-        ctx.restore();
-    }
+            // start waiting to go to sleep
+            var check = function check() {
+                if (_this.touch + 1000 < window.performance.now()) {
+                    _this.sleep();
+                } else {
+                    setTimeout(check, 1000);
+                }
+            };
+            setTimeout(check, 1000);
+
+            this.awake = true;
+        }
+    }]);
+
+    return MoveList;
+})();
+
+implementation.move_list = function (el) {
+    return new MoveList(el);
 };
 
 // Hook into the sections of the page, only firing implementations when visible
@@ -260,7 +311,7 @@ var sections = Array.from(document.querySelectorAll('[data-key]')).map(function 
     return {
         element: e,
         key: e.dataset.key,
-        fn: implementation[e.dataset.key]
+        fn: implementation[e.dataset.key] && implementation[e.dataset.key](e)
     };
 });
 
@@ -316,7 +367,7 @@ function render(t) {
     updateActive();
 
     active.forEach(function (s) {
-        if (s.fn) s.fn.call(null, t, s.element);
+        if (s.fn) s.fn.render(t, s.element);
     });
 }
 
