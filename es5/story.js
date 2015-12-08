@@ -161,6 +161,11 @@ var MoveList = (function () {
 
         this.canvas = element.querySelector('canvas');
         this.ctx = this.canvas.getContext('2d');
+
+        // don't allow scrolling from here
+        element.addEventListener('touchstart', function (e) {
+            return e.preventDefault();
+        });
     }
 
     _createClass(MoveList, [{
@@ -303,6 +308,124 @@ var MoveList = (function () {
 
 implementation.move_list = function (el) {
     return new MoveList(el);
+};
+
+var MoveGraph = (function () {
+    function MoveGraph(element) {
+        _classCallCheck(this, MoveGraph);
+
+        this.awake = false;
+
+        this.canvas = element.querySelector('canvas');
+        this.ctx = this.canvas.getContext('2d');
+
+        // don't allow scrolling from here
+        element.addEventListener('touchstart', function (e) {
+            return e.preventDefault();
+        });
+    }
+
+    _createClass(MoveGraph, [{
+        key: 'render',
+        value: function render(timestamp) {
+            if (!this.awake) this.wake();
+            this.touch = timestamp || window.performance.now();
+
+            // The actual stuff
+            if (!current) return;
+
+            this.last = this.past;
+
+            if (!this.past) this.past = current;
+
+            // traverse forward in time until we are
+            // within 1.5 seconds of now
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+                for (var _iterator4 = points(this.past)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    this.past = _step4.value;
+
+                    if (this.past.timestamp > timestamp - 1500) break;
+                }
+            } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
+                    }
+                } finally {
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
+                    }
+                }
+            }
+
+            if (this.past != this.last || this.first != current) {
+                this.first = current;
+
+                // end of actual stuff
+
+                // let canvas = element.querySelector('canvas');
+                // let ctx = canvas.getContext('2d');
+
+                var r = range(points(this.past));
+                var e = extent(r);
+                var d = distance(e);
+                // console.log(r,e,d)
+
+                var canvas = this.canvas;
+                var ctx = this.ctx;
+
+                ctx.lineWidth = 3;
+                ctx.fillStyle = '#08f';
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillRect(0, 0, e.x, 50);
+                ctx.fillRect(0, 50, e.y, 50);
+                ctx.fillRect(0, 100, d, 50);
+            }
+        }
+    }, {
+        key: 'sleep',
+        value: function sleep() {
+            this.past = this.last = this.first = null;
+            this.awake = false;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    }, {
+        key: 'wake',
+        value: function wake() {
+            var _this2 = this;
+
+            this.past = this.last = this.first = null;
+
+            // start waiting to go to sleep
+            var check = function check() {
+                if (_this2.touch + 1000 < window.performance.now()) {
+                    _this2.sleep();
+                } else {
+                    setTimeout(check, 1000);
+                }
+            };
+            setTimeout(check, 1000);
+
+            this.awake = true;
+        }
+    }]);
+
+    return MoveGraph;
+})();
+
+implementation.move_graph = function (el) {
+    return new MoveGraph(el);
 };
 
 // Hook into the sections of the page, only firing implementations when visible

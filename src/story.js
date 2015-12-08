@@ -123,6 +123,9 @@ class MoveList {
         this.canvas = element.querySelector('canvas');
         this.ctx = this.canvas.getContext('2d');
 
+        // don't allow scrolling from here
+        element.addEventListener('touchstart', e => e.preventDefault())
+
     }
 
     render(timestamp) {
@@ -219,6 +222,111 @@ class MoveList {
 
 
 implementation.move_list = el => new MoveList(el);
+
+
+
+
+
+
+
+
+class MoveGraph {
+
+    constructor(element) {
+        this.awake = false;
+
+        this.canvas = element.querySelector('canvas');
+        this.ctx = this.canvas.getContext('2d');
+
+
+        // don't allow scrolling from here
+        element.addEventListener('touchstart', e => e.preventDefault())
+
+    }
+
+    render(timestamp) {
+        if(!this.awake) this.wake();
+        this.touch = timestamp || window.performance.now();
+
+
+        // The actual stuff
+        if (!current) return
+
+        this.last = this.past
+
+        if (!this.past) this.past = current
+
+        // traverse forward in time until we are
+        // within 1.5 seconds of now
+        for(this.past of points(this.past))
+          if(this.past.timestamp > timestamp - 1500)
+            break
+
+        if(this.past != this.last || this.first != current){
+            this.first = current
+
+        // end of actual stuff
+
+            // let canvas = element.querySelector('canvas');
+            // let ctx = canvas.getContext('2d');
+
+            let r = range(points(this.past))
+            let e = extent(r)
+            let d = distance(e)
+            // console.log(r,e,d)
+
+            let canvas = this.canvas;
+            let ctx = this.ctx;
+
+            ctx.lineWidth = 3;
+            ctx.fillStyle = '#08f'
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+
+            ctx.clearRect(0,0, canvas.width, canvas.height)
+
+            ctx.fillRect(0,0,  e.x, 50)
+            ctx.fillRect(0,50, e.y, 50)
+            ctx.fillRect(0,100,d,   50)
+
+
+        }
+
+
+
+    }
+
+    sleep(){
+        this.past = this.last = this.first = null;
+        this.awake = false;
+        this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height)
+    }
+    wake(){
+        this.past = this.last = this.first = null;
+
+        // start waiting to go to sleep
+        let check = () => {
+            if(this.touch + 1000 < window.performance.now()) {
+                this.sleep();
+            } else {
+                setTimeout(check, 1000)
+            }
+        }
+        setTimeout(check, 1000);
+
+        this.awake = true;
+
+    }
+
+}
+
+
+implementation.move_graph = el => new MoveGraph(el);
+
+
+
+
 
 // Hook into the sections of the page, only firing implementations when visible
 
