@@ -16,6 +16,15 @@ const move = fn => {
     });
 }
 
+const move3 = fn => {
+    window.addEventListener('deviceorientation', (e) => {
+        fn.call(null,
+            e.gamma,
+            e.beta,
+            e.alpha)
+    });
+}
+
 
 
 // Actual stuff
@@ -45,51 +54,159 @@ move(
 )
 
 
-function * points(p) {
+function* points(p) {
     do yield p
     while (p = p.next)
 }
 
 const range = (points) => {
 
-    let minX, maxX, minY, maxY, first = true;
+    // let min = new Point.Min()
+    // let max = new Point.Min()
+    //
+    // for(let n of points) {
+    //   min.min(n);
+    //   max.max(n);
+    // }
+    //
+    // return {min, max}
+    //
+
+
+
+    let x_min, x_max, y_min, y_max, first = true;
 
     for(let n of points) {
         if(first){
-            minX = maxX = n.x;
-            minY = maxY = n.y;
+            x_min = x_max = n.x;
+            y_min = y_max = n.y;
             first = false;
             continue;
         }
 
-        if (n.x < minX) {minX = n.x}
-        else if (n.x > maxX ) {maxX = n.x}
+        if (n.x < x_min) {x_min = n.x}
+        else if (n.x > x_max ) {x_max = n.x}
 
-        if (n.y < minY) {minY = n.y}
-        else if (n.y > maxY) {maxY = n.y}
+        if (n.y < y_min) {y_min = n.y}
+        else if (n.y > y_max) {y_max = n.y}
     }
 
     return {
-        x:{min: minX, max: maxX},
-        y:{min: minY, max: maxY}
+      x: {min: x_min, max: x_max},
+      y: {min: y_min, max: y_max}
     }
+
+}
+
+
+let extent = (r) => {
+  let x = r.x.max - r.x.min,
+      y = r.y.max - r.y.min
+
+  return {x, y}
+}
+
+
+let distance = (e) =>
+    Math.sqrt(
+        Math.pow(e.x, 2) +
+        Math.pow(e.y, 2)
+  )
+
+
+let scale = a => b => a * b
+
+let clamp = max => d => Math.min(max, Math.max(0, d))
+
+let colour = i => `rgb(${i}, ${255-i}, 0)`
+
+
+
+
+class Point3 {
+  constructor (x, y, z, last) {
+
+    this.x = x
+    this.y = y
+    this.z = z
+
+    this.timestamp = window.performance.now()
+
+    if (last) last.next = this
+
+  }
+}
+
+
+let currentO = null;
+
+// helper function for adding mouse/touch move listeners
+move3(
+	(x, y, z) => {
+    currentO = new Point3(x, y, z, currentO)
+  }
+)
+
+
+
+const READY = 1, STARTED = 2, LOST = 4
+let state = READY
+
+let start = () => {
+  if(state & READY | LOST) {
+    removeButton()
+    state = STARTED
+  }
+}
+
+let lose = () => {
+  if(state & STARTED) {
+    showButton()
+    state = LOST
+  }
 }
 
 
 
-let extent = (range) => ({
-  x: range.x.max - range.x.min,
-  y: range.y.max - range.y.min
-})
-
-let distance = (range) =>
-    Math.sqrt(
-        Math.pow(range.x, 2) +
-        Math.pow(range.y, 2)
-  )
 
 
 
+
+
+
+
+
+
+class Wakeable {
+
+  constructor(element) {
+      this.awake = false;
+  }
+
+  render(timestamp) {
+      if(!this.awake) this.wake();
+      this.touch = timestamp || window.performance.now();
+  }
+
+  sleep(){
+      this.awake = false;
+  }
+
+  wake(){
+      // start waiting to go to sleep
+      let check = () => {
+          if(this.touch + 1000 < window.performance.now()) {
+              this.sleep();
+          } else {
+              setTimeout(check, 1000)
+          }
+      }
+      setTimeout(check, 1000);
+
+      this.awake = true;
+  }
+
+}
 
 
 
@@ -166,6 +283,8 @@ class MoveList {
 
             let s = Math.min(w / e.x , h / e.y, 2.5);
 
+            s *= 0.95;
+
             let tx = -r.x.min - (e.x/2);
             let ty = -r.y.min - (e.y/2);
 
@@ -239,6 +358,13 @@ class MoveGraph {
         this.ctx = this.canvas.getContext('2d');
 
 
+        // this.ctx.lineWidth = 3;
+        this.ctx.fillStyle = '#08f'
+        this.ctx.lineCap = "round";
+        this.ctx.lineJoin = "round";
+        // this.ctx.translate()
+
+
         // don't allow scrolling from here
         element.addEventListener('touchstart', e => e.preventDefault())
 
@@ -278,17 +404,50 @@ class MoveGraph {
             let canvas = this.canvas;
             let ctx = this.ctx;
 
-            ctx.lineWidth = 3;
-            ctx.fillStyle = '#08f'
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
-
 
             ctx.clearRect(0,0, canvas.width, canvas.height)
+            ctx.save();
+            let s = canvas.width/2;
+            let angle = (Math.PI * 2 *  (d/300));
+            // console.log(angle)
+            ctx.fillStyle = angle > (Math.PI*2) ? '#f00' : '#08f'
+            ctx.translate(s, s)
+            ctx.rotate((angle*-.5)+ (Math.PI/2))
 
-            ctx.fillRect(0,0,  e.x, 50)
-            ctx.fillRect(0,50, e.y, 50)
-            ctx.fillRect(0,100,d,   50)
+            ctx.beginPath()
+            ctx.moveTo(0,0)
+
+            ctx.arc(
+              0,0,
+              s,
+              0,
+              angle
+            );
+
+            ctx.lineTo(0,0)
+
+            ctx.fill()
+
+
+            ctx.fillStyle = '#fff';
+            ctx.beginPath()
+            ctx.moveTo(0,0)
+
+            var r2 = Math.max(0.001,Math.min(1,1-(angle / (Math.PI*2)))) * s;
+
+            ctx.arc(
+              0,0,
+              r2,
+              0,
+              Math.PI * 2
+            );
+
+            ctx.lineTo(0,0)
+
+            ctx.fill()
+
+            ctx.restore();
+
 
 
         }
@@ -324,6 +483,268 @@ class MoveGraph {
 
 implementation.move_graph = el => new MoveGraph(el);
 
+
+
+
+class MoveCalculation extends Wakeable {
+
+  constructor(element) {
+    super();
+    this.el_range = document.getElementById('move_calculation_range')
+    this.el_extent = document.getElementById('move_calculation_extent')
+    this.el_distance = document.getElementById('move_calculation_distance')
+  }
+
+  sleep() {
+    super.sleep()
+    this.start = null;
+  }
+
+  render(timestamp) {
+    super.render();
+
+    if (!current) return
+
+    for(this.start of points(this.start || current))
+      if(this.start.timestamp > timestamp - 1500)
+        break
+
+    let r = range(points(this.start))
+    let e = extent(r)
+    let d = distance(e)
+
+    this.el_range   .textContent = JSON.stringify(r)
+    this.el_extent  .textContent = JSON.stringify(e)
+    this.el_distance.textContent = JSON.stringify(d)
+
+  }
+
+}
+implementation.move_calculation = el => new MoveCalculation(el)
+
+
+
+
+class ColourData extends Wakeable {
+
+  constructor(element) {
+    super();
+    this.el_range = document.getElementById('move_calculation_range')
+    this.el_extent = document.getElementById('move_calculation_extent')
+    this.el_distance = document.getElementById('move_calculation_distance')
+  }
+
+  sleep() {
+    super.sleep()
+    this.start = null;
+  }
+
+  render(timestamp) {
+    super.render();
+
+    if (!current) return
+
+    for(this.start of points(this.start || current))
+      if(this.start.timestamp > timestamp - 1500)
+        break
+
+    let r = range(points(this.start))
+    let e = extent(r)
+    let d = distance(e)
+
+    this.el_range   .textContent = JSON.stringify(r)
+    this.el_extent  .textContent = JSON.stringify(e)
+    this.el_distance.textContent = JSON.stringify(d)
+
+  }
+
+}
+implementation.colour_data = el => new ColourData(el)
+
+
+
+// colour(
+//   clamp(255)(
+//     scale(100)(
+//       distance(
+//         extent(
+//           range(
+//             points(start)
+// )))))
+
+
+
+
+
+
+class ColourCalculation extends Wakeable {
+
+  constructor(element) {
+    super();
+    this.el_scale  = document.getElementById('colour_calculation_scale')
+    this.el_clamp  = document.getElementById('colour_calculation_clamp')
+    this.el_colour = document.getElementById('colour_calculation_colour')
+    this.el_out    = document.getElementById('colour_calculation_out')
+
+  }
+
+  sleep() {
+    super.sleep()
+    this.start = null;
+  }
+
+  render(timestamp) {
+    super.render();
+
+    if (!current) return
+
+    for(this.start of points(this.start || current))
+      if(this.start.timestamp > timestamp - 1500)
+        break
+
+    let r = range(points(this.start))
+    let e = extent(r)
+    let d = distance(e)
+
+    let s  = scale(255/300)(d)
+    let c  = clamp(255)(parseInt(s))
+    let cl = colour(c)
+
+    this.el_scale  .textContent = JSON.stringify(s)
+    this.el_clamp  .textContent = JSON.stringify(c)
+    this.el_colour .textContent = JSON.stringify(cl)
+
+    this.el_out.style.backgroundColor = cl
+  }
+
+}
+implementation.colour_calculation = el => new ColourCalculation(el)
+
+
+
+
+
+
+
+class OrientationCurrent {
+    constructor(element) {
+        this.element = element;
+    }
+
+    render(timestamp) {
+        if(this.last !== currentO){
+            this.element.textContent = JSON.stringify(currentO, null, 2)
+            this.last = current
+        }
+
+    }
+}
+
+implementation.orientation_current = el => new OrientationCurrent(el);
+
+
+
+
+
+
+
+
+
+
+
+
+
+class OrientationGraph extends Wakeable {
+
+    constructor(element) {
+      super()
+
+        this.canvas = element;//.querySelector('canvas');
+        this.ctx = this.canvas.getContext('2d');
+
+        // don't allow scrolling from here
+        element.addEventListener('touchstart', e => e.preventDefault())
+
+    }
+
+    render(timestamp) {
+      super.render()
+
+
+        // The actual stuff
+        if (!currentO) return
+
+        this.last = this.past
+
+        if (!this.past) this.past = currentO
+
+        // traverse forward in time until we are
+        // within 1.5 seconds of now
+        for(this.past of points(this.past))
+          if(this.past.timestamp > timestamp - 1500)
+            break
+
+        if(this.past != this.last || this.first != currentO){
+            this.first = current
+
+        // end of actual stuff
+
+            // let canvas = element.querySelector('canvas');
+            // let ctx = canvas.getContext('2d');
+
+            let r = range(points(this.past))
+            let e = extent(r)
+            let d = distance(e)
+            // console.log(r,e,d)
+
+            let canvas = this.canvas;
+            let ctx = this.ctx;
+
+            var w = canvas.width, h = canvas.height;
+
+            let s = Math.min(w / e.x , h / e.y, 2.5);
+
+            s *= 0.95;
+
+            let tx = -r.x.min - (e.x/2);
+            let ty = -r.y.min - (e.y/2);
+
+
+            ctx.clearRect(0,0, canvas.width, canvas.height)
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#08f'
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.save();
+
+            ctx.translate(w/2, h/2)
+            ctx.scale(s,s);
+
+            ctx.translate(tx, ty);
+
+
+            ctx.beginPath();
+            for(let p of points(this.past)){
+                ctx.lineTo(p.x, p.y)
+            }
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+
+
+    }
+
+    sleep(){
+      super.sleep()
+      this.past = this.last = this.first = null;
+    }
+
+}
+
+
+implementation.orientation_graph = el => new OrientationGraph(el);
 
 
 

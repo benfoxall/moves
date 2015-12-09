@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Moves</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
       body {
         max-width: 30em;
@@ -11,11 +12,13 @@
       }
       code {
         font-family: monospace;
-        margin:2em
+        margin:2em;
+        max-width: 100%;
       }
+
       canvas {
-          box-shadow: rgba(0,0,0,0.3) 0 4px 15px;
-          border-radius: 3px
+          /*box-shadow: rgba(0,0,0,0.3) 0 4px 15px;*/
+          /*border-radius: 3px*/
       }
     </style>
   </head>
@@ -39,35 +42,74 @@ if(past != last)
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
 
+
+<code><pre data-key="move_calculation">// <span id="move_calculation_range">[[0, 2], [20, 30]]</span>
+let range = (points) => {
+
+  for(p of points) {
+
+  }
+
+  {
+    x:{min: xMin, max: xMax},
+    y:{min: yMin, max: yMax}
+  }
+}
+
+// <span id="move_calculation_extent">[2, 10]</span>
+let extent = (range) => ({
+  x: range.x.max - range.x.min,
+  y: range.y.max - range.y.min
+})
+
+// <span id="move_calculation_distance">123</span>
+let distance (e) =>
+  Math.sqrt(
+    Math.pow(e.x, 2) +
+    Math.pow(e.y, 2)
+  )
+</pre></code>
+
+
+
     <div data-key="move_graph">
-        <canvas height="250" width="400"></canvas>
+        <canvas height="150" width="150"></canvas>
     </div>
 
     <h2>Colours</h2>
 
-    <section data-key="colour_bg">
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
 
-<code data-key="colour_data"><pre>norm = d => Math.max(1, d/100)
-  // 0.3365
+<code data-key="colour_calculation"><pre>
+let scale = a => b => a * b
+  // s = (255/300)(d) = <span id="colour_calculation_scale">0</span>
 
-colour = i => `rgb(${i * 255}, ${1-i * 255}, 255)`
-  // rgb(6,7,4)
+let clamp = max => d => Math.min(max, Math.max(0, d))
+  // i = (255)(~~s) = <span id="colour_calculation_clamp">0</span>
+
+let colour = i => `rgb(${i}, ${255-i}, 0)`
+  // (i) = <span id="colour_calculation_colour">0</span>
+
+// now we can take our distance and turn it into a colour
+colour(clamp(255)(parseInt(scale(100)(d))))
+
+<div id="colour_calculation_out" style="width:100%; height:150px;">
+
+</div>
 </pre></code>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    </section>
 
     <hr />
 
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-    <code><pre data-key="orientation_point">{
+    <code><pre data-key="orientation_current">{
 	gamma: …
 	alpha: …
 	beta: …
@@ -76,9 +118,9 @@ colour = i => `rgb(${i * 255}, ${1-i * 255}, 255)`
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est alaborum.</p>
 
 
-    <div data-key="orientation_graph">
-        <canvas height="400" width="300"></canvas>
-    </div>
+
+    <canvas height="200" width="300" data-key="orientation_graph"></canvas>
+
 
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
