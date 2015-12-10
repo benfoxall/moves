@@ -166,6 +166,86 @@ var colour = function colour(i) {
     return 'rgb(' + i + ', ' + (255 - i) + ', 0)';
 };
 
+// 3d versions
+
+var range3 = function range3(points) {
+
+    var x_min = undefined,
+        x_max = undefined,
+        y_min = undefined,
+        y_max = undefined,
+        z_min = undefined,
+        z_max = undefined,
+        first = true;
+
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
+
+    try {
+        for (var _iterator2 = points[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var n = _step2.value;
+
+            if (first) {
+                x_min = x_max = n.x;
+                y_min = y_max = n.y;
+                z_min = z_max = n.z;
+                first = false;
+                continue;
+            }
+
+            if (n.x < x_min) {
+                x_min = n.x;
+            } else if (n.x > x_max) {
+                x_max = n.x;
+            }
+
+            if (n.y < y_min) {
+                y_min = n.y;
+            } else if (n.y > y_max) {
+                y_max = n.y;
+            }
+
+            if (n.z < z_min) {
+                z_min = n.z;
+            } else if (n.z > z_max) {
+                z_max = n.z;
+            }
+        }
+    } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+    } finally {
+        try {
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                _iterator2.return();
+            }
+        } finally {
+            if (_didIteratorError2) {
+                throw _iteratorError2;
+            }
+        }
+    }
+
+    return {
+        x: { min: x_min, max: x_max },
+        y: { min: y_min, max: y_max },
+        z: { min: z_min, max: z_max }
+    };
+};
+
+var extent3 = function extent3(r) {
+    var x = r.x.max - r.x.min,
+        y = r.y.max - r.y.min,
+        z = r.z.max - r.z.min;
+
+    return { x: x, y: y, z: z };
+};
+
+var distance3 = function distance3(e) {
+    return Math.sqrt(Math.pow(e.x, 2) + Math.pow(e.y, 2) + Math.pow(e.z, 2));
+};
+
 var Point3 = function Point3(x, y, z, last) {
     _classCallCheck(this, Point3);
 
@@ -190,17 +270,23 @@ var READY = 1,
     LOST = 4;
 var state = READY;
 
+var button = document.getElementById('state_game_button');
+
 var start = function start() {
     if (state & READY | LOST) {
         state = STARTED;
+        button.style.opacity = 0;
     }
 };
 
 var lose = function lose() {
     if (state & STARTED) {
         state = LOST;
+        button.style.opacity = 1;
     }
 };
+
+button.addEventListener('click', start);
 
 var Wakeable = (function () {
     function Wakeable(element) {
@@ -298,27 +384,27 @@ var MoveList = (function () {
 
             // traverse forward in time until we are
             // within 1.5 seconds of now
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
 
             try {
-                for (var _iterator2 = points(this.past)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    this.past = _step2.value;
+                for (var _iterator3 = points(this.past)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    this.past = _step3.value;
 
                     if (this.past.timestamp > timestamp - 1500) break;
                 }
             } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
                     }
                 } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
                     }
                 }
             }
@@ -362,27 +448,27 @@ var MoveList = (function () {
                 ctx.translate(tx, ty);
 
                 ctx.beginPath();
-                var _iteratorNormalCompletion3 = true;
-                var _didIteratorError3 = false;
-                var _iteratorError3 = undefined;
+                var _iteratorNormalCompletion4 = true;
+                var _didIteratorError4 = false;
+                var _iteratorError4 = undefined;
 
                 try {
-                    for (var _iterator3 = points(this.past)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                        var p = _step3.value;
+                    for (var _iterator4 = points(this.past)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                        var p = _step4.value;
 
                         ctx.lineTo(p.x, p.y);
                     }
                 } catch (err) {
-                    _didIteratorError3 = true;
-                    _iteratorError3 = err;
+                    _didIteratorError4 = true;
+                    _iteratorError4 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                            _iterator3.return();
+                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                            _iterator4.return();
                         }
                     } finally {
-                        if (_didIteratorError3) {
-                            throw _iteratorError3;
+                        if (_didIteratorError4) {
+                            throw _iteratorError4;
                         }
                     }
                 }
@@ -463,27 +549,27 @@ var MoveGraph = (function () {
 
             // traverse forward in time until we are
             // within 1.5 seconds of now
-            var _iteratorNormalCompletion4 = true;
-            var _didIteratorError4 = false;
-            var _iteratorError4 = undefined;
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
 
             try {
-                for (var _iterator4 = points(this.past)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    this.past = _step4.value;
+                for (var _iterator5 = points(this.past)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    this.past = _step5.value;
 
                     if (this.past.timestamp > timestamp - 1500) break;
                 }
             } catch (err) {
-                _didIteratorError4 = true;
-                _iteratorError4 = err;
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                        _iterator4.return();
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
                     }
                 } finally {
-                    if (_didIteratorError4) {
-                        throw _iteratorError4;
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
                     }
                 }
             }
@@ -599,27 +685,27 @@ var MoveCalculation = (function (_Wakeable) {
 
             if (!current) return;
 
-            var _iteratorNormalCompletion5 = true;
-            var _didIteratorError5 = false;
-            var _iteratorError5 = undefined;
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
 
             try {
-                for (var _iterator5 = points(this.start || current)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    this.start = _step5.value;
+                for (var _iterator6 = points(this.start || current)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                    this.start = _step6.value;
 
                     if (this.start.timestamp > timestamp - 1500) break;
                 }
             } catch (err) {
-                _didIteratorError5 = true;
-                _iteratorError5 = err;
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                        _iterator5.return();
+                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                        _iterator6.return();
                     }
                 } finally {
-                    if (_didIteratorError5) {
-                        throw _iteratorError5;
+                    if (_didIteratorError6) {
+                        throw _iteratorError6;
                     }
                 }
             }
@@ -668,27 +754,27 @@ var ColourData = (function (_Wakeable2) {
 
             if (!current) return;
 
-            var _iteratorNormalCompletion6 = true;
-            var _didIteratorError6 = false;
-            var _iteratorError6 = undefined;
+            var _iteratorNormalCompletion7 = true;
+            var _didIteratorError7 = false;
+            var _iteratorError7 = undefined;
 
             try {
-                for (var _iterator6 = points(this.start || current)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                    this.start = _step6.value;
+                for (var _iterator7 = points(this.start || current)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                    this.start = _step7.value;
 
                     if (this.start.timestamp > timestamp - 1500) break;
                 }
             } catch (err) {
-                _didIteratorError6 = true;
-                _iteratorError6 = err;
+                _didIteratorError7 = true;
+                _iteratorError7 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                        _iterator6.return();
+                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                        _iterator7.return();
                     }
                 } finally {
-                    if (_didIteratorError6) {
-                        throw _iteratorError6;
+                    if (_didIteratorError7) {
+                        throw _iteratorError7;
                     }
                 }
             }
@@ -748,27 +834,27 @@ var ColourCalculation = (function (_Wakeable3) {
 
             if (!current) return;
 
-            var _iteratorNormalCompletion7 = true;
-            var _didIteratorError7 = false;
-            var _iteratorError7 = undefined;
+            var _iteratorNormalCompletion8 = true;
+            var _didIteratorError8 = false;
+            var _iteratorError8 = undefined;
 
             try {
-                for (var _iterator7 = points(this.start || current)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                    this.start = _step7.value;
+                for (var _iterator8 = points(this.start || current)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                    this.start = _step8.value;
 
                     if (this.start.timestamp > timestamp - 1500) break;
                 }
             } catch (err) {
-                _didIteratorError7 = true;
-                _iteratorError7 = err;
+                _didIteratorError8 = true;
+                _iteratorError8 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                        _iterator7.return();
+                    if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                        _iterator8.return();
                     }
                 } finally {
-                    if (_didIteratorError7) {
-                        throw _iteratorError7;
+                    if (_didIteratorError8) {
+                        throw _iteratorError8;
                     }
                 }
             }
@@ -853,42 +939,42 @@ var OrientationGraph = (function (_Wakeable4) {
 
             // traverse forward in time until we are
             // within 1.5 seconds of now
-            var _iteratorNormalCompletion8 = true;
-            var _didIteratorError8 = false;
-            var _iteratorError8 = undefined;
+            var _iteratorNormalCompletion9 = true;
+            var _didIteratorError9 = false;
+            var _iteratorError9 = undefined;
 
             try {
-                for (var _iterator8 = points(this.past)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                    this.past = _step8.value;
+                for (var _iterator9 = points(this.past)[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+                    this.past = _step9.value;
 
                     if (this.past.timestamp > timestamp - 1500) break;
                 }
             } catch (err) {
-                _didIteratorError8 = true;
-                _iteratorError8 = err;
+                _didIteratorError9 = true;
+                _iteratorError9 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                        _iterator8.return();
+                    if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                        _iterator9.return();
                     }
                 } finally {
-                    if (_didIteratorError8) {
-                        throw _iteratorError8;
+                    if (_didIteratorError9) {
+                        throw _iteratorError9;
                     }
                 }
             }
 
             if (this.past != this.last || this.first != currentO) {
-                this.first = current;
+                this.first = currentO;
 
                 // end of actual stuff
 
                 // let canvas = element.querySelector('canvas');
                 // let ctx = canvas.getContext('2d');
 
-                var r = range(points(this.past));
-                var e = extent(r);
-                var d = distance(e);
+                var r = range3(points(this.past));
+                var e = extent3(r);
+                var d = distance3(e);
                 // console.log(r,e,d)
 
                 var canvas = this.canvas;
@@ -917,27 +1003,27 @@ var OrientationGraph = (function (_Wakeable4) {
                 ctx.translate(tx, ty);
 
                 ctx.beginPath();
-                var _iteratorNormalCompletion9 = true;
-                var _didIteratorError9 = false;
-                var _iteratorError9 = undefined;
+                var _iteratorNormalCompletion10 = true;
+                var _didIteratorError10 = false;
+                var _iteratorError10 = undefined;
 
                 try {
-                    for (var _iterator9 = points(this.past)[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-                        var p = _step9.value;
+                    for (var _iterator10 = points(this.past)[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+                        var p = _step10.value;
 
                         ctx.lineTo(p.x, p.y);
                     }
                 } catch (err) {
-                    _didIteratorError9 = true;
-                    _iteratorError9 = err;
+                    _didIteratorError10 = true;
+                    _iteratorError10 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion9 && _iterator9.return) {
-                            _iterator9.return();
+                        if (!_iteratorNormalCompletion10 && _iterator10.return) {
+                            _iterator10.return();
                         }
                     } finally {
-                        if (_didIteratorError9) {
-                            throw _iteratorError9;
+                        if (_didIteratorError10) {
+                            throw _iteratorError10;
                         }
                     }
                 }
@@ -960,6 +1046,115 @@ var OrientationGraph = (function (_Wakeable4) {
 
 implementation.orientation_graph = function (el) {
     return new OrientationGraph(el);
+};
+
+var StateCode = (function () {
+    function StateCode(element) {
+        _classCallCheck(this, StateCode);
+
+        this.element = element;
+    }
+
+    _createClass(StateCode, [{
+        key: 'render',
+        value: function render(timestamp) {
+            if (this.last === state) return;
+
+            this.element.textContent = state & READY ? 'READY' : state & STARTED ? 'STARTED' : state & LOST ? 'LOST' : 'UNKNOWN';
+
+            this.last = state;
+        }
+    }]);
+
+    return StateCode;
+})();
+
+implementation.state_code = function (el) {
+    return new StateCode(el);
+};
+
+var StateGame = (function (_Wakeable5) {
+    _inherits(StateGame, _Wakeable5);
+
+    function StateGame(element) {
+        _classCallCheck(this, StateGame);
+
+        var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(StateGame).call(this));
+
+        _this8.element = element;
+        // this.button = document.getElementById('state_game_start');
+        // this.button.addEventListener('click', start, false);
+        return _this8;
+    }
+
+    _createClass(StateGame, [{
+        key: 'render',
+        value: function render(timestamp) {
+            _get(Object.getPrototypeOf(StateGame.prototype), 'render', this).call(this);
+            if (state & LOST) return this.past = this.last = this.first = null;
+
+            // The actual stuff
+            if (!currentO) return;
+
+            this.last = this.past;
+
+            if (!this.past) this.past = currentO;
+
+            // traverse forward in time until we are
+            // within 1.5 seconds of now
+            var _iteratorNormalCompletion11 = true;
+            var _didIteratorError11 = false;
+            var _iteratorError11 = undefined;
+
+            try {
+                for (var _iterator11 = points(this.past)[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+                    this.past = _step11.value;
+
+                    if (this.past.timestamp > timestamp - 1500) break;
+                }
+            } catch (err) {
+                _didIteratorError11 = true;
+                _iteratorError11 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion11 && _iterator11.return) {
+                        _iterator11.return();
+                    }
+                } finally {
+                    if (_didIteratorError11) {
+                        throw _iteratorError11;
+                    }
+                }
+            }
+
+            if (this.past != this.last || this.first != currentO) {
+                this.first = currentO;
+
+                var r = range3(points(this.past));
+                var e = extent3(r);
+                var d = distance3(e);
+                // consoel.l
+
+                var c = clamp(255)(parseInt(scale(255 / 300)(d)));
+
+                this.element.style.backgroundColor = colour(c);
+
+                if (c > 254) lose();
+            }
+        }
+    }, {
+        key: 'sleep',
+        value: function sleep() {
+            _get(Object.getPrototypeOf(StateGame.prototype), 'sleep', this).call(this);
+            this.past = this.last = this.first = null;
+        }
+    }]);
+
+    return StateGame;
+})(Wakeable);
+
+implementation.state_game = function (el) {
+    return new StateGame(el);
 };
 
 // Hook into the sections of the page, only firing implementations when visible
@@ -1029,3 +1224,27 @@ function render(t) {
 }
 
 render(window.performance.now());
+
+// Article helper stuff
+var enableTouchHelpCircles = function enableTouchHelpCircles() {
+    document.body.className += ' help-touch';
+    document.removeEventListener('touchstart', enableTouchHelpCircles);
+};
+document.addEventListener('touchstart', enableTouchHelpCircles, false);
+
+document.addEventListener('touchstart', function (e) {
+    var target = e.target;
+
+    if (target.dataset.help === 'touch') {
+        (function () {
+            e.preventDefault();
+
+            target.classList.add('helping');
+            var helped = function helped() {
+                document.removeEventListener('touchend', helped);
+                target.classList.remove('helping');
+            };
+            document.addEventListener('touchend', helped, false);
+        })();
+    }
+}, false);

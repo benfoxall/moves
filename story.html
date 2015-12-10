@@ -6,12 +6,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="assets/other.css" charset="utf-8">
     <style>
-      body {
-        background: url(assets/bg.jpg);
-      }
       canvas {
           max-width: 100%;
+          margin:auto;
       }
+
+      code {
+        position: relative;
+        overflow: visible;
+      }
+
+      .help-circle {
+        width:100%;
+        position: relative;
+        margin-top:-1rem;
+        margin-bottom: 2rem;
+      }
+
+      .help-circle button {
+        position: absolute;
+        height:48px;
+        width:48px;
+        right:12px;
+        top:-34px;
+
+        border: none;
+        border-radius: 50%;
+        background: rgba(218, 42, 50, 0.84);
+        box-shadow: rgba(0, 0, 0, 0.3) -2px 3px 5px;
+
+        will-change: transform;
+        transition: all .5s;
+      }
+
+      .help-circle button.helping {
+        transform: scale(0.01);
+      }
+
+      .help-circle.touch button {
+        transform: scale(0.01);
+      }
+
+      .help-touch .help-circle.touch button{
+        transform: scale(1);
+      }
+
+      #game {
+        /*height:200px;*/
+        background: #ccc;
+        text-align: center;
+        padding:5%;
+      }
+
+      #game button {
+        font-size: 2em;
+        padding:1em;
+        width:90%;
+
+        will-change: opacity;
+        transition: opacity .25s;
+      }
+
     </style>
   </head>
   <body>
@@ -25,7 +80,15 @@
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-    <pre><code>// current = <span data-key="move_current">{x: , y: , time: }</span></code></pre>
+    <pre><code>// current =
+<span data-key="move_current">{
+  "x": 162,
+  "y": 346,
+  "timestamp": 7734.76
+}</span>
+</code></pre>
+<div class="help-circle touch"><button data-help="touch"></button></div>
+
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
@@ -36,6 +99,7 @@ if(past != last)
   /*
 <div data-key="move_list"><!-- TODO make sure canvas is sized for HW optimisation --><canvas height="250" width="400"></canvas>
 </div>*/</code></pre>
+<div class="help-circle touch"><button data-help="touch"></button></div>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
 
@@ -66,12 +130,14 @@ let distance (e) =>
     Math.pow(e.y, 2)
   )
 </code></pre>
+<div class="help-circle touch"><button data-help="touch"></button></div>
 
 
 
     <div data-key="move_graph">
         <canvas height="150" width="150"></canvas>
     </div>
+    <div class="help-circle touch"><button data-help="touch"></button></div>
 
     <h2>Colours</h2>
 
@@ -125,102 +191,38 @@ colour(clamp(255)(parseInt(scale(100)(d))))
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-    <code><pre  data-key="state_buttons">const READY = 1, STARTED = 2, LOST = 4
-let state = <span id="_state_value">READY</span>
+    <pre><code>const READY = 1,
+      STARTED = 2,
+      LOST = 4
 
-<button id="_state_start">start</button>
-let start = () => {
+let state = READY
+
+function start () {
   if(state &amp; READY | LOST) {
+    hideButton()
     state = STARTED
   }
 }
-<button id="_state_lose">lose</button>
-let lose = () => {
+
+function lose () {
   if(state &amp; STARTED) {
+    showButton()
     state = LOST
   }
 }
-</pre>
 
+// state = <span data-key="state_code">READY</span>
+</code></pre>
+
+<div data-key="state_game" id="game">
+  <button id="state_game_button">START</button>
+</div>
+
+
+  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
 <script src="es5/polyfill.js"></script>
 <script src="es5/story.js"></script>
 
-
-<!--script src="es5/timestore.js"></script-->
-<!--script src="es5/fns.js"></script-->
-<!--script src="es5/story.js"></script-->
-<!--script type="text/javascript">
-
-  var pointstore = new TimeStore(['pageX', 'pageY']);
-
-  var canvas = document.createElement('canvas');
-  var ctx = canvas.getContext('2d');
-  // document.body.appendChild(canvas);
-  document.body.insertBefore(canvas,document.body.firstChild);
-
-
-  var resize = function () {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-  };
-  resize();
-  window.addEventListener('resize', resize);
-
-  var speeds = ["…", "cool", "totally fine", "yeah", "okay", "almost too fast", "too fast!!!"];
-
-  function render () {
-    requestAnimationFrame(render);
-
-    var extent = pointstore.extent(1500);
-    var d = distance(extent);
-
-    outputX.innerText = Math.floor(extent[0]) || 0;
-    outputY.innerText = Math.floor(extent[1]) || 0;
-    outputDistance.innerText = Math.floor(d);
-
-    outputSpeed.innerText = speeds[Math.min(Math.floor(d/75), speeds.length-1)];
-
-    var a = window.scrollY < 600 ? 0 : Math.min((window.scrollY - 600)/300, 1);
-    ctx.fillStyle = colour(d/700, a);
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    ctx.strokeStyle = '#ddd';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-
-    pointstore.each(1000, function(x, y) {
-      ctx.lineTo(x, y);
-      ctx.arc(x,y,2,0,2*Math.PI);
-      ctx.moveTo(x, y);
-    });
-
-    ctx.stroke();
-
-
-  };
-
-  render();
-
-  document.addEventListener('mousemove', function(e){
-    pointstore.add.bind(pointstore)({
-      pageX: e.pageX - window.scrollX,
-      pageY: e.pageY - window.scrollY
-    })
-  }, false);
-
-  document.addEventListener('touchmove', function(e){
-    for (var i = 0; i < e.touches.length; i++) {
-      pointstore.add({
-        pageX:e.touches[i].pageX  - window.scrollX,
-        pageY:e.touches[i].pageY - window.scrollY
-      })
-    }
-  });
-
-</script-->
-
-  </body>
+</body>
 </html>

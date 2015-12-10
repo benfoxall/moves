@@ -123,6 +123,64 @@ let colour = i => `rgb(${i}, ${255-i}, 0)`
 
 
 
+
+// 3d versions
+
+const range3 = (points) => {
+
+    let x_min, x_max, y_min, y_max, z_min, z_max, first = true;
+
+    for(let n of points) {
+        if(first){
+            x_min = x_max = n.x;
+            y_min = y_max = n.y;
+            z_min = z_max = n.z;
+            first = false;
+            continue;
+        }
+
+        if (n.x < x_min) {x_min = n.x}
+        else if (n.x > x_max ) {x_max = n.x}
+
+        if (n.y < y_min) {y_min = n.y}
+        else if (n.y > y_max) {y_max = n.y}
+
+
+        if (n.z < z_min) {z_min = n.z}
+        else if (n.z > z_max) {z_max = n.z}
+    }
+
+    return {
+      x: {min: x_min, max: x_max},
+      y: {min: y_min, max: y_max},
+      z: {min: z_min, max: z_max}
+    }
+
+}
+
+
+let extent3 = (r) => {
+  let x = r.x.max - r.x.min,
+      y = r.y.max - r.y.min,
+      z = r.z.max - r.z.min
+
+  return {x, y, z}
+}
+
+
+let distance3 = (e) =>
+  Math.sqrt(
+    Math.pow(e.x, 2) +
+    Math.pow(e.y, 2) +
+    Math.pow(e.z, 2)
+  )
+
+
+
+
+
+
+
 class Point3 {
   constructor (x, y, z, last) {
 
@@ -151,18 +209,24 @@ move3(
 const READY = 1, STARTED = 2, LOST = 4
 let state = READY
 
-let start = () => {
+const button = document.getElementById('state_game_button');
+
+const start = () => {
   if(state & READY | LOST) {
     state = STARTED
+    button.style.opacity = 0
   }
 }
 
-let lose = () => {
+const lose = () => {
   if(state & STARTED) {
-    state = LOST
+    state = LOST;
+    button.style.opacity = 1
   }
 }
 
+
+button.addEventListener('click', start)
 
 
 
@@ -682,16 +746,16 @@ class OrientationGraph extends Wakeable {
             break
 
         if(this.past != this.last || this.first != currentO){
-            this.first = current
+            this.first = currentO
 
         // end of actual stuff
 
             // let canvas = element.querySelector('canvas');
             // let ctx = canvas.getContext('2d');
 
-            let r = range(points(this.past))
-            let e = extent(r)
-            let d = distance(e)
+            let r = range3(points(this.past))
+            let e = extent3(r)
+            let d = distance3(e)
             // console.log(r,e,d)
 
             let canvas = this.canvas;
@@ -742,6 +806,100 @@ class OrientationGraph extends Wakeable {
 
 
 implementation.orientation_graph = el => new OrientationGraph(el);
+
+
+
+
+
+class StateCode {
+
+    constructor(element) {
+      this.element = element;
+    }
+
+    render(timestamp) {
+      if(this.last === state) return;
+
+      this.element.textContent =
+        state & READY ? 'READY' :
+        state & STARTED ? 'STARTED' :
+        state & LOST ? 'LOST' : 'UNKNOWN'
+
+      this.last = state;
+
+
+    }
+
+
+}
+
+
+implementation.state_code = el => new StateCode(el);
+
+
+
+
+
+
+class StateGame extends Wakeable {
+
+    constructor(element) {
+      super()
+
+      this.element = element;
+      // this.button = document.getElementById('state_game_start');
+      // this.button.addEventListener('click', start, false);
+    }
+
+    render(timestamp) {
+      super.render()
+      if(state & LOST) return this.past = this.last = this.first = null;
+
+
+
+        // The actual stuff
+        if (!currentO) return
+
+        this.last = this.past
+
+        if (!this.past) this.past = currentO
+
+        // traverse forward in time until we are
+        // within 1.5 seconds of now
+        for(this.past of points(this.past))
+          if(this.past.timestamp > timestamp - 1500)
+            break
+
+        if(this.past != this.last || this.first != currentO){
+            this.first = currentO;
+
+
+            let r = range3(points(this.past))
+            let e = extent3(r)
+            let d = distance3(e)
+            // consoel.l
+
+            let c = clamp(255)(parseInt(scale(255/300)(d)))
+
+            this.element.style.backgroundColor = colour(c)
+
+            if(c > 254) lose()
+
+        }
+
+
+
+    }
+
+    sleep(){
+      super.sleep()
+      this.past = this.last = this.first = null;
+    }
+
+}
+
+
+implementation.state_game = el => new StateGame(el);
 
 
 
@@ -821,3 +979,32 @@ function render(t){
 }
 
 render(window.performance.now());
+
+
+
+
+
+// Article helper stuff
+let enableTouchHelpCircles = () => {
+  document.body.className += ' help-touch'
+  document.removeEventListener('touchstart', enableTouchHelpCircles)
+}
+document.addEventListener('touchstart', enableTouchHelpCircles, false);
+
+
+
+document.addEventListener('touchstart', e => {
+  let target = e.target;
+
+  if(target.dataset.help === 'touch'){
+    e.preventDefault();
+
+    target.classList.add('helping');
+    let helped = () => {
+      document.removeEventListener('touchend', helped)
+      target.classList.remove('helping');
+    }
+    document.addEventListener('touchend', helped, false)
+
+  }
+}, false)
