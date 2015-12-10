@@ -192,14 +192,12 @@ var state = READY;
 
 var start = function start() {
     if (state & READY | LOST) {
-        removeButton();
         state = STARTED;
     }
 };
 
 var lose = function lose() {
     if (state & STARTED) {
-        showButton();
         state = LOST;
     }
 };
@@ -257,7 +255,7 @@ var MoveCurrent = (function () {
         key: 'render',
         value: function render(timestamp) {
             if (this.last !== current) {
-                this.element.textContent = JSON.stringify(current);
+                this.element.textContent = JSON.stringify(current, null, 2);
                 this.last = current;
             }
         }
@@ -353,7 +351,7 @@ var MoveList = (function () {
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.lineWidth = 3;
-                ctx.strokeStyle = '#08f';
+                ctx.strokeStyle = '#fff';
                 ctx.lineCap = "round";
                 ctx.lineJoin = "round";
                 ctx.save();

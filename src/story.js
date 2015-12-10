@@ -148,20 +148,17 @@ move3(
 )
 
 
-
 const READY = 1, STARTED = 2, LOST = 4
 let state = READY
 
 let start = () => {
   if(state & READY | LOST) {
-    removeButton()
     state = STARTED
   }
 }
 
 let lose = () => {
   if(state & STARTED) {
-    showButton()
     state = LOST
   }
 }
@@ -219,7 +216,7 @@ class MoveCurrent {
 
     render(timestamp) {
         if(this.last !== current){
-            this.element.textContent = JSON.stringify(current)
+            this.element.textContent = JSON.stringify(current, null, 2)
             this.last = current
         }
 
@@ -291,7 +288,7 @@ class MoveList {
 
             ctx.clearRect(0,0, canvas.width, canvas.height)
             ctx.lineWidth = 3;
-            ctx.strokeStyle = '#08f'
+            ctx.strokeStyle = '#fff'
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
             ctx.save();

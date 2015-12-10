@@ -4,46 +4,43 @@
     <meta charset="utf-8">
     <title>Moves</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/other.css" charset="utf-8">
     <style>
       body {
-        max-width: 30em;
-        margin:auto;
-        font-family: sans-serif;
+        background: url(assets/bg.jpg);
       }
-      code {
-        font-family: monospace;
-        margin:2em;
-        max-width: 100%;
-      }
-
       canvas {
-          /*box-shadow: rgba(0,0,0,0.3) 0 4px 15px;*/
-          /*border-radius: 3px*/
+          max-width: 100%;
       }
     </style>
   </head>
   <body>
 
+    <div class="content"><!-- I -->
+    <article class="main-article"><!-- know -->
+    <div class="description entry-content"><!-- html -->
+
+
     <h1>Some stuff</h1>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-    <code><pre>// current = <span data-key="move_current">{x: , y: , time: }</span></pre></code>
+    <pre><code>// current = <span data-key="move_current">{x: , y: , time: }</span></code></pre>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
 
-<code><pre>
+<pre><code>
 if(past != last)
   drawPoints(last)
   /*
 <div data-key="move_list"><!-- TODO make sure canvas is sized for HW optimisation --><canvas height="250" width="400"></canvas>
-</div>*/</pre></code>
+</div>*/</code></pre>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
 
 
-<code><pre data-key="move_calculation">// <span id="move_calculation_range">[[0, 2], [20, 30]]</span>
+<pre><code data-key="move_calculation">// <span id="move_calculation_range">[[0, 2], [20, 30]]</span>
 let range = (points) => {
 
   for(p of points) {
@@ -68,7 +65,7 @@ let distance (e) =>
     Math.pow(e.x, 2) +
     Math.pow(e.y, 2)
   )
-</pre></code>
+</code></pre>
 
 
 
@@ -81,7 +78,7 @@ let distance (e) =>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
 
-<code data-key="colour_calculation"><pre>
+<pre><code data-key="colour_calculation">
 let scale = a => b => a * b
   // s = (255/300)(d) = <span id="colour_calculation_scale">0</span>
 
@@ -94,10 +91,11 @@ let colour = i => `rgb(${i}, ${255-i}, 0)`
 // now we can take our distance and turn it into a colour
 colour(clamp(255)(parseInt(scale(100)(d))))
 
-<div id="colour_calculation_out" style="width:100%; height:150px;">
+</code></pre>
 
+
+<div id="colour_calculation_out" style="width:100%; height:150px;">
 </div>
-</pre></code>
 
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
@@ -131,16 +129,14 @@ colour(clamp(255)(parseInt(scale(100)(d))))
 let state = <span id="_state_value">READY</span>
 
 <button id="_state_start">start</button>
-let start => () => {
+let start = () => {
   if(state &amp; READY | LOST) {
-    removeButton()
     state = STARTED
   }
 }
 <button id="_state_lose">lose</button>
-let lose => () => {
+let lose = () => {
   if(state &amp; STARTED) {
-    showButton()
     state = LOST
   }
 }
