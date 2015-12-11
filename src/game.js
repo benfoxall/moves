@@ -156,7 +156,7 @@ const render = timestamp => {
 
   if(c > 254) lose();
 
-  console.log(d, c)
+  //console.log(d, c)
 
 
 }
@@ -165,4 +165,10 @@ const render = timestamp => {
 requestAnimationFrame(render);
 
 
-button.addEventListener('click', start, false)
+const handle = e => {
+  e.preventDefault()
+  start()
+}
+
+button.addEventListener('click', handle, false)
+button.addEventListener('touchstart', handle, false)

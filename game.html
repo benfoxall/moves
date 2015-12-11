@@ -3,12 +3,15 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="game.manifest.json">
     <title>JoustJS</title>
     <style>
       body {
         margin: 0; text-align: center;
         background: #ccc;
-        transition: background .2s;
+        will-change: background;
+        /*transition: background .2s;*/
+        transform: translateZ(50%);
       }
       button {
         position: absolute;
@@ -30,7 +33,7 @@
       }
 
       button.hidden {
-        box-shadow: rgba(0,0,0,0.1) 0 0 0;
+        /*box-shadow: rgba(0,0,0,0.1) 0 0 0;*/
         transform: translate(-50%, -50%) rotate(20deg) scale(0.8) ;
         opacity: 0;
         outline: none;
@@ -38,7 +41,7 @@
     </style>
   </head>
   <body>
-    <button>⛄️</button>
+    <button>GO</button>
 
     <script src="es5/polyfill.js"></script>
     <script src="es5/game.js"></script>

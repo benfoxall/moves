@@ -212,9 +212,15 @@ var render = function render(timestamp) {
 
   if (c > 254) lose();
 
-  console.log(d, c);
+  //console.log(d, c)
 };
 
 requestAnimationFrame(render);
 
-button.addEventListener('click', start, false);
+var handle = function handle(e) {
+  e.preventDefault();
+  start();
+};
+
+button.addEventListener('click', handle, false);
+button.addEventListener('touchstart', handle, false);
