@@ -226,7 +226,10 @@ const lose = () => {
 }
 
 
-button.addEventListener('click', start)
+button.addEventListener('click', e => {
+  e.preventDefault()
+  start()
+})
 
 
 
@@ -274,17 +277,25 @@ class Wakeable {
 let implementation = {};
 
 class MoveCurrent {
-    constructor(element) {
-        this.element = element;
+  constructor(element) {
+    this.element = element;
+  }
+
+  render(timestamp) {
+    if(this.last !== current && current){
+      let x = ~~current.x,
+          y = ~~current.y,
+          t = ~~current.timestamp;
+
+        this.element.textContent =
+`{
+*  x:${x},
+*  y:${y},
+*  timestamp:${t}
+* }`
     }
 
-    render(timestamp) {
-        if(this.last !== current){
-            this.element.textContent = JSON.stringify(current, null, 2)
-            this.last = current
-        }
-
-    }
+  }
 }
 
 implementation.move_current = el => new MoveCurrent(el);
@@ -301,8 +312,6 @@ class MoveList {
         this.canvas = element.querySelector('canvas');
         this.ctx = this.canvas.getContext('2d');
 
-        // don't allow scrolling from here
-        element.addEventListener('touchstart', e => e.preventDefault())
 
     }
 
@@ -426,8 +435,6 @@ class MoveGraph {
         // this.ctx.translate()
 
 
-        // don't allow scrolling from here
-        element.addEventListener('touchstart', e => e.preventDefault())
 
     }
 
@@ -574,9 +581,11 @@ class MoveCalculation extends Wakeable {
     let e = extent(r)
     let d = distance(e)
 
-    this.el_range   .textContent = JSON.stringify(r)
-    this.el_extent  .textContent = JSON.stringify(e)
-    this.el_distance.textContent = JSON.stringify(d)
+    this.el_range   .textContent =
+      `x = ${r.x.min}…${r.x.max}, y = ${r.y.min}…${r.y.max}`
+    this.el_extent  .textContent =
+      `x = ${e.x}, y = ${e.y}`
+    this.el_distance.textContent = d.toFixed(3)
 
   }
 
@@ -723,8 +732,6 @@ class OrientationGraph extends Wakeable {
         this.canvas = element;//.querySelector('canvas');
         this.ctx = this.canvas.getContext('2d');
 
-        // don't allow scrolling from here
-        element.addEventListener('touchstart', e => e.preventDefault())
 
     }
 

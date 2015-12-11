@@ -286,7 +286,10 @@ var lose = function lose() {
     }
 };
 
-button.addEventListener('click', start);
+button.addEventListener('click', function (e) {
+    e.preventDefault();
+    start();
+});
 
 var Wakeable = (function () {
     function Wakeable(element) {
@@ -340,9 +343,12 @@ var MoveCurrent = (function () {
     _createClass(MoveCurrent, [{
         key: 'render',
         value: function render(timestamp) {
-            if (this.last !== current) {
-                this.element.textContent = JSON.stringify(current, null, 2);
-                this.last = current;
+            if (this.last !== current && current) {
+                var x = ~ ~current.x,
+                    y = ~ ~current.y,
+                    t = ~ ~current.timestamp;
+
+                this.element.textContent = '{\n*  x:' + x + ',\n*  y:' + y + ',\n*  timestamp:' + t + '\n* }';
             }
         }
     }]);
@@ -362,11 +368,6 @@ var MoveList = (function () {
 
         this.canvas = element.querySelector('canvas');
         this.ctx = this.canvas.getContext('2d');
-
-        // don't allow scrolling from here
-        element.addEventListener('touchstart', function (e) {
-            return e.preventDefault();
-        });
     }
 
     _createClass(MoveList, [{
@@ -527,11 +528,6 @@ var MoveGraph = (function () {
         this.ctx.lineCap = "round";
         this.ctx.lineJoin = "round";
         // this.ctx.translate()
-
-        // don't allow scrolling from here
-        element.addEventListener('touchstart', function (e) {
-            return e.preventDefault();
-        });
     }
 
     _createClass(MoveGraph, [{
@@ -714,9 +710,9 @@ var MoveCalculation = (function (_Wakeable) {
             var e = extent(r);
             var d = distance(e);
 
-            this.el_range.textContent = JSON.stringify(r);
-            this.el_extent.textContent = JSON.stringify(e);
-            this.el_distance.textContent = JSON.stringify(d);
+            this.el_range.textContent = 'x = ' + r.x.min + '…' + r.x.max + ', y = ' + r.y.min + '…' + r.y.max;
+            this.el_extent.textContent = 'x = ' + e.x + ', y = ' + e.y;
+            this.el_distance.textContent = d.toFixed(3);
         }
     }]);
 
@@ -916,11 +912,6 @@ var OrientationGraph = (function (_Wakeable4) {
 
         _this7.canvas = element; //.querySelector('canvas');
         _this7.ctx = _this7.canvas.getContext('2d');
-
-        // don't allow scrolling from here
-        element.addEventListener('touchstart', function (e) {
-            return e.preventDefault();
-        });
 
         return _this7;
     }

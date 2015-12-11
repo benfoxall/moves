@@ -39,17 +39,32 @@
         transition: all .5s;
       }
 
-      .help-circle button.helping {
+      .help-circle.touch button.helping {
         transform: scale(0.01);
       }
 
       .help-circle.touch button {
-        transform: scale(0.01);
+        display: none;
       }
 
       .help-touch .help-circle.touch button{
-        transform: scale(1);
+        display: block
       }
+
+      .help-touch-hint {
+        display:none;
+        border: 1px solid #fff;
+        padding: 1em;
+        background: rgba(218, 42, 50, 0.84);
+        color: #fff;
+        -webkit-font-smoothing: antialiased;
+        border-radius: 10px;
+      }
+
+      .help-touch .help-touch-hint{
+        display: block;
+      }
+
 
       #game {
         /*height:200px;*/
@@ -76,68 +91,182 @@
     <div class="description entry-content"><!-- html -->
 
 
-    <h1>Some stuff</h1>
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<h1>SHHHHHH</h1>
 
-    <pre><code>// current =
-<span data-key="move_current">{
-  "x": 162,
-  "y": 346,
-  "timestamp": 7734.76
-}</span>
+<h3>This post is <u>unfinished</u> and <u>SECRET</u>, if you've come across it by accident, please don't share it.  (though tell me if you spot any mistakes!)</h3>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+
+<h2>Detecting sudden movements</h2>
+
+<p>We need to find out when a user makes a sudden movement. Rather than going straight for the orientation events, we’ll use mouse/touch position to make it easier to see what’s going on.</p>
+
+<p>The rule we’re going to implement is: <strong>the cursor must cover no further than 300 pixels in 1.5 seconds.</strong></p>
+
+<p>First, we'll need to store the cursor position, so lets write some javascript:</p>
+
+<pre><code>class Point {
+  constructor (x, y, prev) {
+
+    this.x = x
+    this.y = y
+
+    this.timestamp = window.performance.now()
+
+    if (prev) prev.next = this
+
+  }
+}
+
+// store the most recent point
+let current = null;
+
+// helper function for adding mouse/touch
+// move listeners
+move(
+  (x, y) => {
+    current = new Point(x, y, current)
+  }
+)
+
+/*
+* current:
+* <span data-key="move_current">{
+*  x:…,
+*  y:…,
+*  timestamp:…
+* }</span>
+*/
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+<p class="help-touch-hint"><em>If you're on a touch device, drag from the circle above to prevent scrolling (it'll help you see what’s going on)</em></p>
+
+<p>Right, so this javascript looks kind of weird&hellip; That’s because we’re using class, let, and arrow function syntax from es2015.  At some point in the future (not 2015) this will be totally cool to use this in browsers, but for now it’s safest to transform it into es5 using a tool such as Babel.  To see an example of this kind of workflow (and the compiled es5 files) check out {{{LINK TO REPO}}}.</p>
+
+<p>Back to the code - we’re only storing the most recent point, and linking the last point <strong>toward</strong> it in a <a href="https://en.wikipedia.org/wiki/Linked_list#Singly_linked_list">singly linked list</a>.  This means that we’ve got <strong>no way of accessing previous points</strong> - which is actually kinda good, because the browser can detect that, and garbage collect old data.</p>
+
+<p>When we do want to access data, we can store a reference to the current point, and now all subsequent points are accessible by traversing the <code>.next</code> property.</p>
+
 
 
 <pre><code>
-if(past != last)
-  drawPoints(last)
+function* points(p) {
+  do yield p
+  while (p = p.next)
+}
+
+// the point in the past that we are starting from
+let start;
+
+const render = (timestamp) => {
+  requestAnimationFrame(render)
+
+  if (!current) return
+  if (!start) start = current
+
+  // move forward in the list until we are
+  // within 1.5 seconds of now
+  for(start of points(start))
+    if(past.timestamp > timestamp - 1500)
+      break
+
+  drawPoints(points(start))
   /*
-<div data-key="move_list"><!-- TODO make sure canvas is sized for HW optimisation --><canvas height="250" width="400"></canvas>
-</div>*/</code></pre>
+<div data-key="move_list"><canvas height="200" width="500"></canvas></div>
+  */
+}
+
+requestAnimationFrame(render)
+</code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
 
+<p>Right. Some things:</p>
 
-<pre><code data-key="move_calculation">// <span id="move_calculation_range">[[0, 2], [20, 30]]</span>
-let range = (points) => {
+<ul>
+  <li>`points` is a generator function which lets us traverse through our stored points in a `for … of` loop.</li>
+  <li>We’re calling the render function with `requestAnimationFrame`, this means that the rendering will be called in sync with the browser refresh, and pause when the tab isn’t visible.</li>
+  <li>Also, our render function is being given a `timestamp` variable, this is the equivalent of calling `window.performance.now()`, which lets us compare to the timestamps generated in Point.</li>
+</ul>
 
-  for(p of points) {
+<p>Now that we’ve got access to this data, we can calculate how far the pointer has moved. We’ll define this as the diagonal length of the bounding box of points - that way it’s a bit more robust to wobbly/shaky input when we get to orientation
+.</p>
 
+<pre><code data-key="move_calculation">const range = (points) => {
+
+  let x_min, x_max, y_min, y_max, first = true;
+
+  for(let n of points) {
+      if(first){
+          x_min = x_max = n.x;
+          y_min = y_max = n.y;
+          first = false;
+          continue;
+      }
+
+      if (n.x < x_min) {x_min = n.x}
+      else if (n.x > x_max ) {x_max = n.x}
+
+      if (n.y < y_min) {y_min = n.y}
+      else if (n.y > y_max) {y_max = n.y}
   }
 
-  {
-    x:{min: xMin, max: xMax},
-    y:{min: yMin, max: yMax}
+  return {
+    x: {min: x_min, max: x_max},
+    y: {min: y_min, max: y_max}
   }
 }
 
-// <span id="move_calculation_extent">[2, 10]</span>
-let extent = (range) => ({
+/*
+* Range of points over last 1.5s:
+*  <span id="move_calculation_range">x: …, y = …</span>
+*/
+
+
+const extent = (range) => ({
   x: range.x.max - range.x.min,
   y: range.y.max - range.y.min
 })
 
-// <span id="move_calculation_distance">123</span>
-let distance (e) =>
+/*
+* Extent of those points:
+*  <span id="move_calculation_extent">x = 0, y = 0</span>
+*/
+
+
+const distance (e) =>
   Math.sqrt(
     Math.pow(e.x, 2) +
     Math.pow(e.y, 2)
   )
+/*
+* Distance covered:
+*  <span id="move_calculation_distance">0</span>
+*/
+
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
 
+<p>Great.</p>
 
-    <div data-key="move_graph">
-        <canvas height="150" width="150"></canvas>
-    </div>
-    <div class="help-circle touch"><button data-help="touch"></button></div>
+<p>Now we can use this to implement our rule of “a cursor must cover no further than 300 pixels in 1.5 seconds”:</p>
+
+
+<div data-key="move_graph">
+    <canvas height="150" width="150"></canvas>
+</div>
+<div class="help-circle touch"><button data-help="touch"></button></div>
+
+
+Now want to take our movement and display it as a colour so the player can see if they’re moving too much. Because it’s christmas, we’ll go from green to red.
+
+We can convert the distance into a colour by scaling it to 0 -> 255,
 
     <h2>Colours</h2>
 
@@ -160,38 +289,62 @@ colour(clamp(255)(parseInt(scale(100)(d))))
 </code></pre>
 
 
-<div id="colour_calculation_out" style="width:100%; height:150px;">
-</div>
+<p id="colour_calculation_out" style="width:100%; height:150px;">
+</p>
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-    <hr />
+<p>Cool.</p>
 
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<h2>Movement</h2>
 
-    <code><pre data-key="orientation_current">{
-	gamma: …
-	alpha: …
-	beta: …
+<p>To detect movement - we’ll listen for DeviceOrientation events,  these have alpha, beta, gamma properties, which allow you find which way the device is pointing.  Super.</p>
+
+
+<code><pre data-key="orientation_current">{
+  gamma: …
+  alpha: …
+  beta: …
 }</pre></code>
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est alaborum.</p>
+<p>We can slightly modify our Point, range, extent, and distance functions to deal with our new properties.</p>
+
+<pre><code>
+  // all the other stuff
+<canvas height="200" width="300" data-key="orientation_graph"></canvas>
+</code></pre>
+
+<h2>TODO</h2>
+
+<p>There’s a bit of a problem - when the alpha goes past 360 degrees, it’ll snap back to 0, which causes a big jump in distance, and makes us falsely detect a sudden movement.</p>
+
+<p>We can get around this by mapping our output values to wrap back to zero with something like:</p>
 
 
+<pre><code data-key="colour_calculation">
+let wrap = e => ({
+    alpha: Math.sin(Math.PI*(e.alpha/360)),
+    beta:  Math.sin(Math.PI*(e.beta /360)),
+    gamma: Math.sin(Math.PI*(e.gamma/180))
+})
+</code></pre>
 
-    <canvas height="200" width="300" data-key="orientation_graph"></canvas>
+
+<h2>Game state</h2>
+
+<p>We’ve got a game, but you can’t really lose or win.  For that we’ve got to add some state.</p>
+
+<pre><code>[ready, started, lost]</code></pre>
+
+And there are (depressingly) only two transitions between these states:
+
+<pre><code>[start, lose]</code></pre>
+
+<p>The absence of `won/win` is because our devices aren’t connected together, so we can’t really tell if only one person is left. Come along to [Frontier Conf](https://www.frontierconf.com/) in March, and I’ll show you how to do this.</p>
+
+<p>We can model this game logic with something like:</p>
 
 
-
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-    <pre><code>const READY = 1,
+<pre><code>const READY = 1,
       STARTED = 2,
       LOST = 4
 
@@ -218,8 +371,20 @@ function lose () {
   <button id="state_game_button">START</button>
 </div>
 
+<h2>The rest of the owl</h2>
 
-  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p>We’ve got all this logic, now we can stick it all together and get a game:</p>
+
+
+<p>Now we can add some more stuff:</p>
+
+<ul>
+<li>some html - because it’s a webpage</li>
+<li>a manifest file - so we can launch in fullscreen and lock the orientation</li>
+<li>a cool little script by Max to change the heading colour to make the url bar awesome</li>
+<li>Vibrate and Audio feedback so you know when you’ve lost</li>
+<li>a service worker - to allow this to all happen offline.</li>
+</ul>
 
 <script src="es5/polyfill.js"></script>
 <script src="es5/story.js"></script>
