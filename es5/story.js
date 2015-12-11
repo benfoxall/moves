@@ -26,10 +26,14 @@ var move = function move(fn) {
     });
 };
 
+var backdoor = undefined;
+
 var move3 = function move3(fn) {
     window.addEventListener('deviceorientation', function (e) {
         fn.call(null, e.gamma, e.beta, e.alpha);
     });
+
+    backdoor = fn;
 };
 
 // Actual stuff
@@ -1236,6 +1240,62 @@ document.addEventListener('touchstart', function (e) {
                 target.classList.remove('helping');
             };
             document.addEventListener('touchend', helped, false);
+        })();
+    }
+}, false);
+
+/*
+
+
+document.addEventListener('mousemove', (e) => {
+    fn.call(null,
+        e.pageX - window.scrollX,
+        e.pageY - window.scrollY)
+}, false);
+*/
+
+var disableMoveHelpCircles = function disableMoveHelpCircles(e) {
+    if (!e.alpha) return;
+    console.log("ORIENT", e);
+    document.body.className += ' no-help-move';
+    window.removeEventListener('deviceorientation', disableMoveHelpCircles);
+};
+window.addEventListener('deviceorientation', disableMoveHelpCircles, false);
+
+//
+document.addEventListener('mousedown', function (e) {
+    var target = e.target;
+
+    if (target.dataset.help === 'move') {
+        (function () {
+            e.preventDefault();
+
+            var startX = e.pageX;
+            var startY = e.pageY;
+            var handleMove = function handleMove(e) {
+
+                var a = e.pageX - startX;
+                var b = e.pageY - startY;
+                var c = Math.floor(a - b / 2);
+
+                var at = (a % 360 + 360) % 360;
+                var bt = (b % 360 + 360) % 360 - 180;
+                var ct = (c % 180 + 180) % 180 - 90;
+
+                if (backdoor) backdoor(at, bt, ct);
+
+                target.style.transform = 'rotateY(' + a + 'deg) rotateX(' + b + 'deg) rotateZ(' + c * 2 + 'deg)';
+            };
+            document.addEventListener('mousemove', handleMove, false);
+
+            target.classList.add('helping');
+            var helped = function helped() {
+                document.removeEventListener('mouseup', helped);
+                document.removeEventListener('mousemove', handleMove);
+                target.classList.remove('helping');
+                target.style.transform = '';
+            };
+            document.addEventListener('mouseup', helped, false);
         })();
     }
 }, false);

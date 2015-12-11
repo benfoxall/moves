@@ -32,12 +32,31 @@
 
         border: none;
         border-radius: 50%;
-        background: rgba(218, 42, 50, 0.84);
+        background: rgba(218, 42, 50, 0.9);
         box-shadow: rgba(0, 0, 0, 0.3) -2px 3px 5px;
 
         will-change: transform;
         transition: all .5s;
+
+        cursor: pointer;
       }
+
+
+
+      .no-help-move .help-circle.move{
+        display: none;
+      }
+
+      .help-circle.move button.helping{
+        box-shadow: rgba(0, 0, 0, 0.3) 0 0 0;
+        transition: all .1s;
+        border-radius: 45%;
+      }
+
+      .no-help-move .help-move-hint {
+        display:none;
+      }
+
 
       .help-circle.touch button.helping {
         transform: scale(0.01);
@@ -51,14 +70,17 @@
         display: block
       }
 
-      .help-touch-hint {
-        display:none;
+      .help-move-hint, .help-touch-hint {
         border: 1px solid #fff;
         padding: 1em;
         background: rgba(218, 42, 50, 0.84);
         color: #fff;
         -webkit-font-smoothing: antialiased;
         border-radius: 10px;
+      }
+
+      .help-touch-hint {
+        display:none;
       }
 
       .help-touch .help-touch-hint{
@@ -315,11 +337,16 @@ colour(clamp(255)(parseInt(scale(100)(d))))
 <p>To detect movement - we’ll listen for DeviceOrientation events,  these have alpha, beta, gamma properties, which allow you find which way the device is pointing.  Super.</p>
 
 
-<code><pre data-key="orientation_current">{
+<pre><code data-key="orientation_current">{
   gamma: …
   alpha: …
   beta: …
-}</pre></code>
+}</code></pre>
+
+<div class="help-circle move"><button data-help="move"></button></div>
+
+<p class="help-move-hint"><em>To fire some fake events, drag the red circle</em></p>
+
 
 <p>We can slightly modify our Point, range, extent, and distance functions to deal with our new properties.</p>
 
@@ -328,20 +355,31 @@ colour(clamp(255)(parseInt(scale(100)(d))))
 <canvas height="200" width="300" data-key="orientation_graph"></canvas>
 </code></pre>
 
-<h2>TODO</h2>
+<div class="help-circle move"><button data-help="move"></button></div>
+
+
 
 <p>There’s a bit of a problem - when the alpha goes past 360 degrees, it’ll snap back to 0, which causes a big jump in distance, and makes us falsely detect a sudden movement.</p>
 
 <p>We can get around this by mapping our output values to wrap back to zero with something like:</p>
 
 
-<pre><code data-key="colour_calculation">
-let wrap = e => ({
-    alpha: Math.sin(Math.PI*(e.alpha/360)),
-    beta:  Math.sin(Math.PI*(e.beta /360)),
-    gamma: Math.sin(Math.PI*(e.gamma/180))
+<pre><code>const convert = p => ({
+    alpha: Math.sin(Math.PI*(p.alpha/360)),
+    beta:  Math.sin(Math.PI*(p.beta /360)),
+    gamma: Math.sin(Math.PI*(p.gamma/180))
 })
+
+/*
+* converted: <span data-key="orientation_convert">
+*   gamma = _
+*   alpha = _
+*   beta  = _</span>
+*/
 </code></pre>
+
+<div class="help-circle move"><button data-help="move"></button></div>
+
 
 
 <h2>Game state</h2>
@@ -385,6 +423,9 @@ function lose () {
 <div data-key="state_game" id="game">
   <button id="state_game_button">START</button>
 </div>
+
+<p></p>
+<div class="help-circle move"><button data-help="move"></button></div>
 
 <h2>The rest of the owl</h2>
 
