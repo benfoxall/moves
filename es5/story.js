@@ -8,7 +8,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _marked = [points].map(regeneratorRuntime.mark);
+var _marked = [points, gmap].map(regeneratorRuntime.mark);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -268,6 +268,20 @@ var currentO = null;
 move3(function (x, y, z) {
     currentO = new Point3(x, y, z, currentO);
 });
+
+// const convert = p => ({
+//     alpha: Math.sin(Math.PI*(p.alpha/360)),
+//     beta:  Math.sin(Math.PI*(p.beta /360)),
+//     gamma: Math.sin(Math.PI*(p.gamma/180))
+// })
+
+var convert = function convert(p) {
+    return {
+        x: Math.sin(2 * Math.PI * (p.x / 360)),
+        y: Math.sin(2 * Math.PI * (p.y / 360)),
+        z: Math.sin(2 * Math.PI * (p.z / 180))
+    };
+};
 
 var READY = 1,
     STARTED = 2,
@@ -986,8 +1000,8 @@ var OrientationGraph = (function (_Wakeable4) {
                 var ty = -r.y.min - e.y / 2;
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = '#08f';
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#fff';
                 ctx.lineCap = "round";
                 ctx.lineJoin = "round";
                 ctx.save();
@@ -1068,6 +1082,74 @@ implementation.state_code = function (el) {
     return new StateCode(el);
 };
 
+function gmap(generator, fn) {
+    var _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, p;
+
+    return regeneratorRuntime.wrap(function gmap$(_context2) {
+        while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+                _iteratorNormalCompletion11 = true;
+                _didIteratorError11 = false;
+                _iteratorError11 = undefined;
+                _context2.prev = 3;
+                _iterator11 = generator[Symbol.iterator]();
+
+            case 5:
+                if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
+                    _context2.next = 12;
+                    break;
+                }
+
+                p = _step11.value;
+                _context2.next = 9;
+                return fn(p);
+
+            case 9:
+                _iteratorNormalCompletion11 = true;
+                _context2.next = 5;
+                break;
+
+            case 12:
+                _context2.next = 18;
+                break;
+
+            case 14:
+                _context2.prev = 14;
+                _context2.t0 = _context2['catch'](3);
+                _didIteratorError11 = true;
+                _iteratorError11 = _context2.t0;
+
+            case 18:
+                _context2.prev = 18;
+                _context2.prev = 19;
+
+                if (!_iteratorNormalCompletion11 && _iterator11.return) {
+                    _iterator11.return();
+                }
+
+            case 21:
+                _context2.prev = 21;
+
+                if (!_didIteratorError11) {
+                    _context2.next = 24;
+                    break;
+                }
+
+                throw _iteratorError11;
+
+            case 24:
+                return _context2.finish(21);
+
+            case 25:
+                return _context2.finish(18);
+
+            case 26:
+            case 'end':
+                return _context2.stop();
+        }
+    }, _marked[1], this, [[3, 14, 18, 26], [19,, 21, 25]]);
+}
+
 var StateGame = (function (_Wakeable5) {
     _inherits(StateGame, _Wakeable5);
 
@@ -1097,27 +1179,27 @@ var StateGame = (function (_Wakeable5) {
 
             // traverse forward in time until we are
             // within 1.5 seconds of now
-            var _iteratorNormalCompletion11 = true;
-            var _didIteratorError11 = false;
-            var _iteratorError11 = undefined;
+            var _iteratorNormalCompletion12 = true;
+            var _didIteratorError12 = false;
+            var _iteratorError12 = undefined;
 
             try {
-                for (var _iterator11 = points(this.past)[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-                    this.past = _step11.value;
+                for (var _iterator12 = points(this.past)[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+                    this.past = _step12.value;
 
                     if (this.past.timestamp > timestamp - 1500) break;
                 }
             } catch (err) {
-                _didIteratorError11 = true;
-                _iteratorError11 = err;
+                _didIteratorError12 = true;
+                _iteratorError12 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion11 && _iterator11.return) {
-                        _iterator11.return();
+                    if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                        _iterator12.return();
                     }
                 } finally {
-                    if (_didIteratorError11) {
-                        throw _iteratorError11;
+                    if (_didIteratorError12) {
+                        throw _iteratorError12;
                     }
                 }
             }
@@ -1125,12 +1207,13 @@ var StateGame = (function (_Wakeable5) {
             if (this.past != this.last || this.first != currentO) {
                 this.first = currentO;
 
-                var r = range3(points(this.past));
+                var r = range3(gmap(points(this.past), convert));
                 var e = extent3(r);
                 var d = distance3(e);
+                // console.log(d);
                 // consoel.l
 
-                var c = clamp(255)(parseInt(scale(255 / 300)(d)));
+                var c = clamp(255)(parseInt(scale(255 / 2)(d)));
 
                 this.element.style.backgroundColor = colour(c);
 
@@ -1150,6 +1233,45 @@ var StateGame = (function (_Wakeable5) {
 
 implementation.state_game = function (el) {
     return new StateGame(el);
+};
+
+var OrientationConvert = (function (_Wakeable6) {
+    _inherits(OrientationConvert, _Wakeable6);
+
+    function OrientationConvert(element) {
+        _classCallCheck(this, OrientationConvert);
+
+        var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(OrientationConvert).call(this));
+
+        _this9.element = element;
+
+        return _this9;
+    }
+
+    _createClass(OrientationConvert, [{
+        key: 'render',
+        value: function render(timestamp) {
+            _get(Object.getPrototypeOf(OrientationConvert.prototype), 'render', this).call(this);
+
+            if (!currentO || this.last == currentO) return;
+
+            var c = convert(currentO);
+
+            this.element.textContent = '\n*   gamma = ' + c.x + '\n*   alpha = ' + c.y + '\n*   beta  = ' + c.z + ('\n\nWAS\n*   gamma = ' + currentO.x + '\n*   alpha = ' + currentO.y + '\n*   beta  = ' + currentO.z);
+        }
+    }, {
+        key: 'sleep',
+        value: function sleep() {
+            _get(Object.getPrototypeOf(OrientationConvert.prototype), 'sleep', this).call(this);
+            this.last = null;
+        }
+    }]);
+
+    return OrientationConvert;
+})(Wakeable);
+
+implementation.orientation_convert = function (el) {
+    return new OrientationConvert(el);
 };
 
 // Hook into the sections of the page, only firing implementations when visible

@@ -179,8 +179,6 @@ move(
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
-
-
 <p class="help-touch-hint"><em>If you're on a touch device, drag from the circle above to prevent scrolling (it'll help you see what’s going on)</em></p>
 
 <p>Right, so this javascript looks kind of weird&hellip; That’s because we’re using class, let, and arrow function syntax from es2015.  At some point in the future (not 2015) this will be totally cool to use this in browsers, but for now it’s safest to transform it into es5 using a tool such as Babel.  To see an example of this kind of workflow (and the compiled es5 files) check out {{{LINK TO REPO}}}.</p>
@@ -212,8 +210,7 @@ const render = (timestamp) => {
     if(past.timestamp > timestamp - 1500)
       break
 
-  drawPoints(points(start))
-  /*
+  /* points(start):
 <div data-key="move_list"><canvas height="200" width="500"></canvas></div>
   */
 }
@@ -301,14 +298,16 @@ const distance (e) =>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
 
-Now want to take our movement and display it as a colour so the player can see if they’re moving too much. Because it’s christmas, we’ll go from green to red.
-
-We can convert the distance into a colour by scaling it to 0 -> 255,
-
-    <h2>Colours</h2>
+<p>Done.</p>
 
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
+
+<h2>Colours</h2>
+
+<p>Now want to take our movement and display it as a colour so the player can see if they’re moving too much. Because it’s christmas, we’ll go from green to red. </p>
+
+<p>We can convert the distance into a colour by scaling it to 0 -> 255, {{TODO}}</p>
+
 
 <pre><code data-key="colour_calculation">
 let scale = a => b => a * b

@@ -211,6 +211,19 @@ move3(
 )
 
 
+// const convert = p => ({
+//     alpha: Math.sin(Math.PI*(p.alpha/360)),
+//     beta:  Math.sin(Math.PI*(p.beta /360)),
+//     gamma: Math.sin(Math.PI*(p.gamma/180))
+// })
+
+const convert = p => ({
+    x: Math.sin(2*Math.PI*(p.x/360)),
+    y: Math.sin(2*Math.PI*(p.y /360)),
+    z: Math.sin(2*Math.PI*(p.z/180))
+})
+
+
 const READY = 1, STARTED = 2, LOST = 4
 let state = READY
 
@@ -416,10 +429,6 @@ class MoveList {
 
 
 implementation.move_list = el => new MoveList(el);
-
-
-
-
 
 
 
@@ -784,8 +793,8 @@ class OrientationGraph extends Wakeable {
 
 
             ctx.clearRect(0,0, canvas.width, canvas.height)
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = '#08f'
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#fff'
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
             ctx.save();
@@ -849,7 +858,11 @@ class StateCode {
 implementation.state_code = el => new StateCode(el);
 
 
+function* gmap(generator, fn){
+  for(let p of generator)
+    yield fn(p)
 
+}
 
 
 
@@ -886,12 +899,13 @@ class StateGame extends Wakeable {
             this.first = currentO;
 
 
-            let r = range3(points(this.past))
+            let r = range3(gmap(points(this.past),convert))
             let e = extent3(r)
             let d = distance3(e)
+            // console.log(d);
             // consoel.l
 
-            let c = clamp(255)(parseInt(scale(255/300)(d)))
+            let c = clamp(255)(parseInt(scale(255/2)(d)))
 
             this.element.style.backgroundColor = colour(c)
 
@@ -912,6 +926,60 @@ class StateGame extends Wakeable {
 
 
 implementation.state_game = el => new StateGame(el);
+
+
+
+
+
+
+
+
+class OrientationConvert extends Wakeable {
+
+    constructor(element) {
+      super()
+
+      this.element = element;
+
+    }
+
+    render(timestamp) {
+      super.render()
+
+      if (!currentO || this.last == currentO) return
+
+      var c = convert(currentO);
+
+      this.element.textContent = `
+*   gamma = ${c.x}
+*   alpha = ${c.y}
+*   beta  = ${c.z}` + `
+
+WAS
+*   gamma = ${currentO.x}
+*   alpha = ${currentO.y}
+*   beta  = ${currentO.z}`
+
+    }
+
+    sleep(){
+      super.sleep()
+      this.last = null;
+    }
+
+}
+
+
+implementation.orientation_convert = el => new OrientationConvert(el);
+
+
+
+
+
+
+
+
+
 
 
 
