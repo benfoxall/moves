@@ -104,7 +104,14 @@
         transition: opacity .25s;
       }
 
+      @media print {
+        .help-move-hint, .help-touch-hint, .help-circle {
+          display: none;
+        }
+      }
+
     </style>
+
   </head>
   <body>
 
@@ -118,15 +125,13 @@
 
 <h3>This post is <u>unfinished</u> and <u>SECRET</u>, if you've come across it by accident, please don't share it.  (though tell me if you spot any mistakes!)</h3>
 
+<hr />
 
-<div class="help-circle move"><button data-help="move"></button></div>
+<p>We’re going to make a game!</p>
 
+<p>Our game is going to be based on <a href="http://www.jsjoust.com/">JSJoust</a>; where players have a controller which they keep still as possible whilst trying to force other players to move theirs.  It’s all done in time to Johann Sebastian Bach (hence the JS).</p>
 
-<p>We’re going to build a game!</p>
-
-<p>This game is going to be based on <a href="http://www.jsjoust.com/">JSJoust</a>; where players have a controller which they have to keep still whilst trying to force other players to move theirs.  It’s all done in time to Johann Sebastian Bach (hence the JS).</p>
-
-<img src="assets/jsjoust.jpg" />
+<img src="assets/jsjoust.jpg" alt="players holding controllers, trying to push each other over" />
 
 <p>You should definitely check it out.  In fact, if you stop reading this post, and go looking for some PS Move controllers to play it - I’d definitely count that as a success.</p>
 
@@ -134,11 +139,11 @@
 
 <p>We’re going to build a version that doesn’t have any Bach (so, just “Joust”), but using Javascript (so, “JoustJS”).  We’ll be displaying a colour on screen to show how much someone is moving, and if they move too much it’ll show that they’ve lost.</p>
 
-<p><strong>Disclaimer time: <em>if you break your phone, it wasn’t my fault.</em></strong></p>
+<p><strong>Disclaimer time: <em>if you break your phone, it isn't my fault<!--, it was probably Olivers. -->.</em></strong></p>
 
 <h2>Detecting sudden movements</h2>
 
-<p>We need to find out when a user makes a sudden movement. Rather than going straight for the orientation events, we’ll use mouse/touch position to make it easier to see what’s going on.</p>
+<p>We want to find out when a user makes a sudden movement. Rather than going straight for the orientation events, we’ll use mouse/touch position to make it easier to see what’s going on.</p>
 
 <p>The rule we’re going to implement is: <strong>the cursor must cover no further than 300 pixels in 1.5 seconds.</strong></p>
 
@@ -364,9 +369,9 @@ colour(clamp(255)(parseInt(scale(100)(d))))
 
 
 <pre><code>const convert = p => ({
-    alpha: Math.sin(Math.PI*(p.alpha/360)),
-    beta:  Math.sin(Math.PI*(p.beta /360)),
-    gamma: Math.sin(Math.PI*(p.gamma/180))
+    alpha: Math.sin(2*Math.PI*(p.alpha/360)),
+    beta:  Math.sin(2*Math.PI*(p.beta /360)),
+    gamma: Math.sin(2*Math.PI*(p.gamma/180))
 })
 
 /*
