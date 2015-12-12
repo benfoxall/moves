@@ -115,7 +115,7 @@ var distance = function distance(e) {
 };
 
 var scale = function scale(d) {
-  return Math.min(1, d);
+  return Math.min(1, d / 2);
 };
 
 var tooFast = function tooFast(s) {
@@ -124,14 +124,6 @@ var tooFast = function tooFast(s) {
 
 var colour = function colour(i) {
   return 'hsl(' + ~ ~((1 - i) * 120) + ', 100%, 45%)';
-};
-
-var convert = function convert(p) {
-  return {
-    gamma: Math.sin(2 * Math.PI * (p.gamma / 360)),
-    alpha: Math.sin(2 * Math.PI * (p.alpha / 360)),
-    beta: Math.sin(2 * Math.PI * (p.beta / 180))
-  };
 };
 
 var READY = 1,
@@ -160,8 +152,7 @@ var current = null;
 
 window.addEventListener('deviceorientation', function (e) {
   if (e.gamma !== null) {
-    var p = convert(e);
-    current = new Orientation(p.gamma, p.beta, p.alpha, current);
+    current = new Orientation(Math.sin(2 * Math.PI * (e.gamma / 360)), Math.sin(2 * Math.PI * (e.alpha / 360)), Math.sin(2 * Math.PI * (e.beta / 180)), current);
   }
 });
 

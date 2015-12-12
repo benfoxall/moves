@@ -40,7 +40,6 @@ const range = (points) => {
         if (n.alpha < a_min) {a_min = n.alpha}
         else if (n.alpha > a_max) {a_max = n.alpha}
 
-
         if (n.beta < b_min) {b_min = n.beta}
         else if (n.beta > b_max) {b_max = n.beta}
     }
@@ -71,17 +70,11 @@ const distance = (e) =>
   )
 
 
-const scale = (d) => Math.min(1, d)
+const scale = (d) => Math.min(1, d/2)
 
 const tooFast = (s) => s === 1
 
 const colour = i => `hsl(${~~((1-i) * 120)}, 100%, 45%)`
-
-const convert = p => ({
-    gamma: Math.sin(2*Math.PI*(p.gamma /360)),
-    alpha: Math.sin(2*Math.PI*(p.alpha /360)),
-    beta: Math.sin(2*Math.PI*(p.beta /180))
-})
 
 
 const READY = 1, STARTED = 2, LOST = 4
@@ -109,12 +102,16 @@ const lose = () => {
 // gather points
 let current = null
 
+
 window.addEventListener('deviceorientation', e => {
   if(e.gamma !== null){
-    let p = convert(e);
-    current = new Orientation(p.gamma, p.beta, p.alpha, current)
+    current = new Orientation(
+        Math.sin(2*Math.PI*(e.gamma /360)),
+        Math.sin(2*Math.PI*(e.alpha /360)),
+        Math.sin(2*Math.PI*(e.beta /180)),
+        current
+      )
   }
-
 });
 
 
