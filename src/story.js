@@ -1007,6 +1007,11 @@ function render(t){
 
 render(window.performance.now());
 
+const on = (obj, name, fn) =>
+  obj.addEventListener(name, fn, false)
+const off = (obj, name, fn) =>
+  obj.removeEventListener(name, fn)
+
 
 
 
@@ -1014,13 +1019,13 @@ render(window.performance.now());
 // Article helper stuff
 let enableTouchHelpCircles = () => {
   document.body.className += ' help-touch'
-  document.removeEventListener('touchstart', enableTouchHelpCircles)
+  off(document, 'touchstart', enableTouchHelpCircles)
 }
-document.addEventListener('touchstart', enableTouchHelpCircles, false);
+on(document, 'touchstart', enableTouchHelpCircles);
 
 
 
-document.addEventListener('touchstart', e => {
+on(document, 'touchstart', e => {
   let target = e.target;
 
   if(target.dataset.help === 'touch'){
@@ -1028,10 +1033,10 @@ document.addEventListener('touchstart', e => {
 
     target.classList.add('helping');
     let helped = () => {
-      document.removeEventListener('touchend', helped)
+      off(document, 'touchend', helped)
       target.classList.remove('helping');
     }
-    document.addEventListener('touchend', helped, false)
+    on(document,'touchend', helped)
 
   }
 }, false)
@@ -1046,16 +1051,8 @@ document.addEventListener('mousemove', (e) => {
 }, false);
 */
 
-let disableMoveHelpCircles = (e) => {
-  if(!e.alpha) return;
-    console.log("ORIENT", e)
-  document.body.className += ' no-help-move'
-  window.removeEventListener('deviceorientation', disableMoveHelpCircles)
-}
-window.addEventListener('deviceorientation', disableMoveHelpCircles, false);
 
-//
-document.addEventListener('mousedown', e => {
+const moveHelp = e => {
   let target = e.target;
 
   if(target.dataset.help === 'move'){
@@ -1078,17 +1075,80 @@ document.addEventListener('mousedown', e => {
       target.style.transform = `rotateY(${a}deg) rotateX(${b}deg) rotateZ(${c*2}deg)`;
 
     }
-    document.addEventListener('mousemove', handleMove, false)
 
+    on(document, 'mousemove', handleMove)
 
     target.classList.add('helping');
+
     let helped = () => {
-      document.removeEventListener('mouseup', helped)
-      document.removeEventListener('mousemove', handleMove)
+      off(document, 'mouseup', helped)
+      off(document, 'mousemove', handleMove)
       target.classList.remove('helping');
       target.style.transform = ''
     }
+
     document.addEventListener('mouseup', helped, false)
 
   }
-}, false)
+}
+
+//
+on(document, 'mousedown', moveHelp)
+
+
+
+
+// Thanks, Android 6.0
+const moveHelpT = e => {
+  let target = e.target;
+
+  if(target.dataset.help === 'move'){
+    e.preventDefault();
+
+    let startX = e.touches[0].pageX;
+    let startY = e.touches[0].pageY;
+    let handleMove = (e) => {
+
+      let a = e.touches[0].pageX - startX;
+      let b = e.touches[0].pageY - startY;
+      let c = Math.floor(a - b / 2);
+
+      let at = (a % 360 + 360) % 360;
+      let bt = ((b % 360 + 360) % 360) - 180;
+      let ct = ((c % 180 + 180) % 180) - 90;
+
+      if(backdoor) backdoor(at,bt,ct)
+
+      target.style.transform = `rotateY(${a}deg) rotateX(${b}deg) rotateZ(${c*2}deg)`;
+
+    }
+
+    on(document, 'touchmove', handleMove)
+
+    target.classList.add('helping');
+
+    let helped = () => {
+      off(document, 'touchend', helped)
+      off(document, 'touchmove', handleMove)
+      target.classList.remove('helping');
+      target.style.transform = ''
+    }
+
+    document.addEventListener('touchend', helped, false)
+
+  }
+}
+
+//
+on(document, 'touchstart', moveHelpT)
+
+
+
+let disableMoveHelpCircles = (e) => {
+  if(!e.alpha) return;
+  document.body.className += ' no-help-move'
+  off(window, 'deviceorientation', disableMoveHelpCircles)
+  off(document, 'mousedown', moveHelp)
+  off(document, 'touchstart', moveHelpT)
+}
+on(window, 'deviceorientation', disableMoveHelpCircles);

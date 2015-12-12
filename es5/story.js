@@ -1296,14 +1296,21 @@ function render(t) {
 
 render(window.performance.now());
 
+var on = function on(obj, name, fn) {
+  return obj.addEventListener(name, fn, false);
+};
+var off = function off(obj, name, fn) {
+  return obj.removeEventListener(name, fn);
+};
+
 // Article helper stuff
 var enableTouchHelpCircles = function enableTouchHelpCircles() {
   document.body.className += ' help-touch';
-  document.removeEventListener('touchstart', enableTouchHelpCircles);
+  off(document, 'touchstart', enableTouchHelpCircles);
 };
-document.addEventListener('touchstart', enableTouchHelpCircles, false);
+on(document, 'touchstart', enableTouchHelpCircles);
 
-document.addEventListener('touchstart', function (e) {
+on(document, 'touchstart', function (e) {
   var target = e.target;
 
   if (target.dataset.help === 'touch') {
@@ -1312,10 +1319,10 @@ document.addEventListener('touchstart', function (e) {
 
       target.classList.add('helping');
       var helped = function helped() {
-        document.removeEventListener('touchend', helped);
+        off(document, 'touchend', helped);
         target.classList.remove('helping');
       };
-      document.addEventListener('touchend', helped, false);
+      on(document, 'touchend', helped);
     })();
   }
 }, false);
@@ -1330,16 +1337,7 @@ document.addEventListener('mousemove', (e) => {
 }, false);
 */
 
-var disableMoveHelpCircles = function disableMoveHelpCircles(e) {
-  if (!e.alpha) return;
-  console.log("ORIENT", e);
-  document.body.className += ' no-help-move';
-  window.removeEventListener('deviceorientation', disableMoveHelpCircles);
-};
-window.addEventListener('deviceorientation', disableMoveHelpCircles, false);
-
-//
-document.addEventListener('mousedown', function (e) {
+var moveHelp = function moveHelp(e) {
   var target = e.target;
 
   if (target.dataset.help === 'move') {
@@ -1362,16 +1360,75 @@ document.addEventListener('mousedown', function (e) {
 
         target.style.transform = 'rotateY(' + a + 'deg) rotateX(' + b + 'deg) rotateZ(' + c * 2 + 'deg)';
       };
-      document.addEventListener('mousemove', handleMove, false);
+
+      on(document, 'mousemove', handleMove);
 
       target.classList.add('helping');
+
       var helped = function helped() {
-        document.removeEventListener('mouseup', helped);
-        document.removeEventListener('mousemove', handleMove);
+        off(document, 'mouseup', helped);
+        off(document, 'mousemove', handleMove);
         target.classList.remove('helping');
         target.style.transform = '';
       };
+
       document.addEventListener('mouseup', helped, false);
     })();
   }
-}, false);
+};
+
+//
+on(document, 'mousedown', moveHelp);
+
+// Thanks, Android 6.0
+var moveHelpT = function moveHelpT(e) {
+  var target = e.target;
+
+  if (target.dataset.help === 'move') {
+    (function () {
+      e.preventDefault();
+
+      var startX = e.touches[0].pageX;
+      var startY = e.touches[0].pageY;
+      var handleMove = function handleMove(e) {
+
+        var a = e.touches[0].pageX - startX;
+        var b = e.touches[0].pageY - startY;
+        var c = Math.floor(a - b / 2);
+
+        var at = (a % 360 + 360) % 360;
+        var bt = (b % 360 + 360) % 360 - 180;
+        var ct = (c % 180 + 180) % 180 - 90;
+
+        if (backdoor) backdoor(at, bt, ct);
+
+        target.style.transform = 'rotateY(' + a + 'deg) rotateX(' + b + 'deg) rotateZ(' + c * 2 + 'deg)';
+      };
+
+      on(document, 'touchmove', handleMove);
+
+      target.classList.add('helping');
+
+      var helped = function helped() {
+        off(document, 'touchend', helped);
+        off(document, 'touchmove', handleMove);
+        target.classList.remove('helping');
+        target.style.transform = '';
+      };
+
+      document.addEventListener('touchend', helped, false);
+    })();
+  }
+};
+
+//
+on(document, 'touchstart', moveHelpT);
+
+var disableMoveHelpCircles = function disableMoveHelpCircles(e) {
+  if (!e.alpha) return;
+  document.body.className += ' no-help-move';
+  off(window, 'deviceorientation', disableMoveHelpCircles);
+  off(document, 'mousedown', moveHelp);
+  off(document, 'touchstart', moveHelpT);
+};
+on(window, 'deviceorientation', disableMoveHelpCircles);
