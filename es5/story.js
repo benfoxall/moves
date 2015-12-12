@@ -1303,10 +1303,25 @@ var off = function off(obj, name, fn) {
   return obj.removeEventListener(name, fn);
 };
 
+var scrollH = function scrollH(selector) {
+
+  // help-move-hint
+  var el = document.querySelector(selector);
+  if (el) {
+    var bounds = el.getBoundingClientRect();
+    return bounds.bottom < 0 ? bounds.height : 0;
+  }
+  return 0;
+};
+
 // Article helper stuff
 var enableTouchHelpCircles = function enableTouchHelpCircles() {
+
   document.body.className += ' help-touch';
   off(document, 'touchstart', enableTouchHelpCircles);
+
+  var h = scrollH('.help-touch-hint');
+  if (h) window.scrollBy(0, h + 22);
 };
 on(document, 'touchstart', enableTouchHelpCircles);
 
@@ -1426,9 +1441,14 @@ on(document, 'touchstart', moveHelpT);
 
 var disableMoveHelpCircles = function disableMoveHelpCircles(e) {
   if (!e.alpha) return;
+  var h = scrollH('.help-move-hint');
+
   document.body.className += ' no-help-move';
   off(window, 'deviceorientation', disableMoveHelpCircles);
   off(document, 'mousedown', moveHelp);
   off(document, 'touchstart', moveHelpT);
+
+  console.log(h);
+  if (h) window.scrollBy(0, -h - 22);
 };
 on(window, 'deviceorientation', disableMoveHelpCircles);

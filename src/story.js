@@ -1012,14 +1012,27 @@ const on = (obj, name, fn) =>
 const off = (obj, name, fn) =>
   obj.removeEventListener(name, fn)
 
+const scrollH = (selector) => {
 
+  // help-move-hint
+  let el = document.querySelector(selector);
+  if(el) {
+    let bounds = el.getBoundingClientRect()
+    return bounds.bottom < 0 ? bounds.height : 0;
+  }
+  return 0;
 
+}
 
 
 // Article helper stuff
 let enableTouchHelpCircles = () => {
+
   document.body.className += ' help-touch'
   off(document, 'touchstart', enableTouchHelpCircles)
+
+  let h = scrollH('.help-touch-hint')
+  if(h) window.scrollBy(0, h + 22)
 }
 on(document, 'touchstart', enableTouchHelpCircles);
 
@@ -1146,9 +1159,14 @@ on(document, 'touchstart', moveHelpT)
 
 let disableMoveHelpCircles = (e) => {
   if(!e.alpha) return;
+  let h = scrollH('.help-move-hint')
+
   document.body.className += ' no-help-move'
   off(window, 'deviceorientation', disableMoveHelpCircles)
   off(document, 'mousedown', moveHelp)
   off(document, 'touchstart', moveHelpT)
+
+  console.log(h)
+  if(h) window.scrollBy(0, - h - 22)
 }
 on(window, 'deviceorientation', disableMoveHelpCircles);
