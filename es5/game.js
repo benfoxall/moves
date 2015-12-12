@@ -4,12 +4,12 @@ var _marked = [points].map(regeneratorRuntime.mark);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Point = function Point(x, y, z, last) {
-  _classCallCheck(this, Point);
+var Orientation = function Orientation(gamma, alpha, beta, last) {
+  _classCallCheck(this, Orientation);
 
-  this.x = x;
-  this.y = y;
-  this.z = z;
+  this.gamma = gamma;
+  this.alpha = alpha;
+  this.beta = beta;
 
   this.timestamp = window.performance.now();
 
@@ -38,12 +38,12 @@ function points(p) {
 
 var range = function range(points) {
 
-  var x_min = undefined,
-      x_max = undefined,
-      y_min = undefined,
-      y_max = undefined,
-      z_min = undefined,
-      z_max = undefined,
+  var g_min = undefined,
+      g_max = undefined,
+      a_min = undefined,
+      a_max = undefined,
+      b_min = undefined,
+      b_max = undefined,
       first = true;
 
   var _iteratorNormalCompletion = true;
@@ -55,29 +55,29 @@ var range = function range(points) {
       var n = _step.value;
 
       if (first) {
-        x_min = x_max = n.x;
-        y_min = y_max = n.y;
-        z_min = z_max = n.z;
+        g_min = g_max = n.gamma;
+        a_min = a_max = n.alpha;
+        b_min = b_max = n.beta;
         first = false;
         continue;
       }
 
-      if (n.x < x_min) {
-        x_min = n.x;
-      } else if (n.x > x_max) {
-        x_max = n.x;
+      if (n.gamma < g_min) {
+        g_min = n.gamma;
+      } else if (n.gamma > g_max) {
+        g_max = n.gamma;
       }
 
-      if (n.y < y_min) {
-        y_min = n.y;
-      } else if (n.y > y_max) {
-        y_max = n.y;
+      if (n.alpha < a_min) {
+        a_min = n.alpha;
+      } else if (n.alpha > a_max) {
+        a_max = n.alpha;
       }
 
-      if (n.z < z_min) {
-        z_min = n.z;
-      } else if (n.z > z_max) {
-        z_max = n.z;
+      if (n.beta < b_min) {
+        b_min = n.beta;
+      } else if (n.beta > b_max) {
+        b_max = n.beta;
       }
     }
   } catch (err) {
@@ -96,38 +96,42 @@ var range = function range(points) {
   }
 
   return {
-    x: { min: x_min, max: x_max },
-    y: { min: y_min, max: y_max },
-    z: { min: z_min, max: z_max }
+    gamma: { min: g_min, max: g_max },
+    alpha: { min: a_min, max: a_max },
+    beta: { min: b_min, max: b_max }
   };
 };
 
 var extent = function extent(r) {
-  var x = r.x.max - r.x.min,
-      y = r.y.max - r.y.min,
-      z = r.z.max - r.z.min;
+  var gamma = r.gamma.max - r.gamma.min,
+      alpha = r.alpha.max - r.alpha.min,
+      beta = r.beta.max - r.beta.min;
 
-  return { x: x, y: y, z: z };
+  return { gamma: gamma, alpha: alpha, beta: beta };
 };
 
 var distance = function distance(e) {
-  return Math.sqrt(Math.pow(e.x, 2) + Math.pow(e.y, 2) + Math.pow(e.z, 2));
+  return Math.sqrt(Math.pow(e.gamma, 2) + Math.pow(e.alpha, 2) + Math.pow(e.beta, 2));
 };
 
-var scale = function scale(a) {
-  return function (b) {
-    return a * b;
-  };
+var scale = function scale(d) {
+  return Math.min(1, d);
 };
 
-var clamp = function clamp(max) {
-  return function (d) {
-    return Math.min(max, Math.max(0, d));
-  };
+var tooFast = function tooFast(s) {
+  return s === 1;
 };
 
 var colour = function colour(i) {
-  return 'rgb(' + i + ', ' + (255 - i) + ', 0)';
+  return 'hsl(' + ~ ~((1 - i) * 120) + ', 100%, 45%)';
+};
+
+var convert = function convert(p) {
+  return {
+    gamma: Math.sin(2 * Math.PI * (p.gamma / 360)),
+    alpha: Math.sin(2 * Math.PI * (p.alpha / 360)),
+    beta: Math.sin(2 * Math.PI * (p.beta / 180))
+  };
 };
 
 var READY = 1,
@@ -155,7 +159,10 @@ var lose = function lose() {
 var current = null;
 
 window.addEventListener('deviceorientation', function (e) {
-  current = new Point(e.gamma, e.beta, e.alpha, current);
+  if (e.gamma !== null) {
+    var p = convert(e);
+    current = new Orientation(p.gamma, p.beta, p.alpha, current);
+  }
 });
 
 // render points
@@ -205,12 +212,16 @@ var render = function render(timestamp) {
   _current = current;
 
   var d = distance(extent(range(points(first))));
+  // console.log(d)
 
-  var c = Math.round(clamp(255)(scale(255 / 80)(d)));
+  var c = scale(d);
+  console.log(c, d);
 
   document.body.style.background = colour(c);
 
-  if (c > 254) lose();
+  if (tooFast(c)) lose();
+
+  // if(c > 254) lose();
 
   //console.log(d, c)
 };

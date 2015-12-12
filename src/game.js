@@ -1,11 +1,11 @@
 
 
-class Point {
-  constructor (x, y, z, last) {
+class Orientation {
+  constructor (gamma, alpha, beta, last) {
 
-    this.x = x
-    this.y = y
-    this.z = z
+    this.gamma = gamma
+    this.alpha = alpha
+    this.beta = beta
 
     this.timestamp = window.performance.now()
 
@@ -23,60 +23,65 @@ function* points(p) {
 
 const range = (points) => {
 
-    let x_min, x_max, y_min, y_max, z_min, z_max, first = true;
+    let g_min, g_max, a_min, a_max, b_min, b_max, first = true;
 
     for(let n of points) {
         if(first){
-            x_min = x_max = n.x
-            y_min = y_max = n.y
-            z_min = z_max = n.z
+            g_min = g_max = n.gamma
+            a_min = a_max = n.alpha
+            b_min = b_max = n.beta
             first = false
             continue
         }
 
-        if (n.x < x_min) {x_min = n.x}
-        else if (n.x > x_max ) {x_max = n.x}
+        if (n.gamma < g_min) {g_min = n.gamma}
+        else if (n.gamma > g_max ) {g_max = n.gamma}
 
-        if (n.y < y_min) {y_min = n.y}
-        else if (n.y > y_max) {y_max = n.y}
+        if (n.alpha < a_min) {a_min = n.alpha}
+        else if (n.alpha > a_max) {a_max = n.alpha}
 
 
-        if (n.z < z_min) {z_min = n.z}
-        else if (n.z > z_max) {z_max = n.z}
+        if (n.beta < b_min) {b_min = n.beta}
+        else if (n.beta > b_max) {b_max = n.beta}
     }
 
     return {
-      x: {min: x_min, max: x_max},
-      y: {min: y_min, max: y_max},
-      z: {min: z_min, max: z_max}
+      gamma: {min: g_min, max: g_max},
+      alpha: {min: a_min, max: a_max},
+      beta:  {min: b_min, max: b_max}
     }
 
 }
 
 
 const extent = (r) => {
-  const x = r.x.max - r.x.min,
-        y = r.y.max - r.y.min,
-        z = r.z.max - r.z.min
+  const gamma = r.gamma.max - r.gamma.min,
+        alpha = r.alpha.max - r.alpha.min,
+        beta  = r.beta.max - r.beta.min
 
-  return {x, y, z}
+  return {gamma, alpha, beta}
 }
 
 
 const distance = (e) =>
   Math.sqrt(
-    Math.pow(e.x, 2) +
-    Math.pow(e.y, 2) +
-    Math.pow(e.z, 2)
+    Math.pow(e.gamma, 2) +
+    Math.pow(e.alpha, 2) +
+    Math.pow(e.beta, 2)
   )
 
 
+const scale = (d) => Math.min(1, d)
 
-const scale = a => b => a * b
+const tooFast = (s) => s === 1
 
-const clamp = max => d => Math.min(max, Math.max(0, d))
+const colour = i => `hsl(${~~((1-i) * 120)}, 100%, 45%)`
 
-const colour = i => `rgb(${i}, ${255-i}, 0)`
+const convert = p => ({
+    gamma: Math.sin(2*Math.PI*(p.gamma /360)),
+    alpha: Math.sin(2*Math.PI*(p.alpha /360)),
+    beta: Math.sin(2*Math.PI*(p.beta /180))
+})
 
 
 const READY = 1, STARTED = 2, LOST = 4
@@ -105,7 +110,11 @@ const lose = () => {
 let current = null
 
 window.addEventListener('deviceorientation', e => {
-  current = new Point(e.gamma, e.beta, e.alpha, current)
+  if(e.gamma !== null){
+    let p = convert(e);
+    current = new Orientation(p.gamma, p.beta, p.alpha, current)
+  }
+
 });
 
 
@@ -143,18 +152,16 @@ const render = timestamp => {
       )
     )
   )
+  // console.log(d)
 
-  const c = Math.round(
-    clamp(255)(
-      scale(255 / 80)(
-        d
-      )
-    )
-  )
+  const c = scale(d);
+  console.log(c, d)
 
   document.body.style.background = colour(c);
 
-  if(c > 254) lose();
+  if(tooFast(c)) lose();
+
+  // if(c > 254) lose();
 
   //console.log(d, c)
 
