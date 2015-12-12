@@ -21,6 +21,7 @@ let backdoor;
 
 const move3 = fn => {
     window.addEventListener('deviceorientation', (e) => {
+      if(e.gamma !== null)
         fn.call(null,
             e.gamma,
             e.beta,
@@ -119,12 +120,17 @@ let distance = (e) =>
   )
 
 
-let scale = a => b => a * b
+const scale = (d) => Math.min(1, d / 300)
 
-let clamp = max => d => Math.min(max, Math.max(0, d))
+const tooFast = (s) => s === 1
 
-let colour = i => `rgb(${i}, ${255-i}, 0)`
+const colour = i => `hsl(${~~((1-i) * 120)}, 100%, 45%)`
 
+
+
+// let scale = a => b => a * b
+
+// let clamp = max => d => Math.min(max, Math.max(0, d))
 
 
 
@@ -240,6 +246,7 @@ const lose = () => {
   if(state & STARTED) {
     state = LOST;
     button.style.opacity = 1
+    button.textContent = 'LOST! (START AGAIN)'
   }
 }
 
@@ -433,22 +440,13 @@ implementation.move_list = el => new MoveList(el);
 
 
 
-class MoveGraph {
+class MoveGraph  extends Wakeable {
 
     constructor(element) {
-        this.awake = false;
+      super()
 
-        this.canvas = element.querySelector('canvas');
-        this.ctx = this.canvas.getContext('2d');
-
-
-        // this.ctx.lineWidth = 3;
-        this.ctx.fillStyle = '#08f'
-        this.ctx.lineCap = "round";
-        this.ctx.lineJoin = "round";
-        // this.ctx.translate()
-
-
+      this.el_text = document.getElementById('move_graph_text')
+      this.el_bar = document.getElementById('move_graph_bar')
 
     }
 
@@ -483,54 +481,15 @@ class MoveGraph {
             let d = distance(e)
             // console.log(r,e,d)
 
-            let canvas = this.canvas;
-            let ctx = this.ctx;
+            let sc = scale(d);
+            let t = tooFast(sc);
 
+            this.el_text.textContent = `
+* scaled: ${sc}
+* toFast: ${t ? 'true': 'false'}`
 
-            ctx.clearRect(0,0, canvas.width, canvas.height)
-            ctx.save();
-            let s = canvas.width/2;
-            let angle = (Math.PI * 2 *  (d/300));
-            // console.log(angle)
-            ctx.fillStyle = angle > (Math.PI*2) ? '#f00' : '#08f'
-            ctx.translate(s, s)
-            ctx.rotate((angle*-.5)+ (Math.PI/2))
-
-            ctx.beginPath()
-            ctx.moveTo(0,0)
-
-            ctx.arc(
-              0,0,
-              s,
-              0,
-              angle
-            );
-
-            ctx.lineTo(0,0)
-
-            ctx.fill()
-
-
-            ctx.fillStyle = '#fff';
-            ctx.beginPath()
-            ctx.moveTo(0,0)
-
-            var r2 = Math.max(0.001,Math.min(1,1-(angle / (Math.PI*2)))) * s;
-
-            ctx.arc(
-              0,0,
-              r2,
-              0,
-              Math.PI * 2
-            );
-
-            ctx.lineTo(0,0)
-
-            ctx.fill()
-
-            ctx.restore();
-
-
+            this.el_bar.style.width = (sc*100) + '%'
+            this.el_bar.style.background = t ? 'red' : '#333';
 
         }
 
@@ -539,27 +498,9 @@ class MoveGraph {
     }
 
     sleep(){
-        this.past = this.last = this.first = null;
-        this.awake = false;
-        this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height)
+      super.sleep();
+      this.past = this.last = this.first = null;
     }
-    wake(){
-        this.past = this.last = this.first = null;
-
-        // start waiting to go to sleep
-        let check = () => {
-            if(this.touch + 1000 < window.performance.now()) {
-                this.sleep();
-            } else {
-                setTimeout(check, 1000)
-            }
-        }
-        setTimeout(check, 1000);
-
-        this.awake = true;
-
-    }
-
 }
 
 
@@ -665,8 +606,8 @@ class ColourCalculation extends Wakeable {
 
   constructor(element) {
     super();
-    this.el_scale  = document.getElementById('colour_calculation_scale')
-    this.el_clamp  = document.getElementById('colour_calculation_clamp')
+    // this.el_scale  = document.getElementById('colour_calculation_scale')
+    // this.el_clamp  = document.getElementById('colour_calculation_clamp')
     this.el_colour = document.getElementById('colour_calculation_colour')
     this.el_out    = document.getElementById('colour_calculation_out')
 
@@ -690,13 +631,12 @@ class ColourCalculation extends Wakeable {
     let e = extent(r)
     let d = distance(e)
 
-    let s  = scale(255/300)(d)
-    let c  = clamp(255)(parseInt(s))
-    let cl = colour(c)
+    let s  = scale(d)
+    let cl = colour(s)
 
-    this.el_scale  .textContent = JSON.stringify(s)
-    this.el_clamp  .textContent = JSON.stringify(c)
-    this.el_colour .textContent = JSON.stringify(cl)
+    // this.el_scale  .textContent = JSON.stringify(s)
+    // this.el_clamp  .textContent = JSON.stringify(c)
+    this.el_colour .textContent = cl
 
     this.el_out.style.backgroundColor = cl
   }
@@ -716,8 +656,13 @@ class OrientationCurrent {
     }
 
     render(timestamp) {
-        if(this.last !== currentO){
-            this.element.textContent = JSON.stringify(currentO, null, 2)
+        if(currentO && this.last !== currentO){
+            this.element.textContent = `{
+  gamma:     ${currentO.x},
+  alpha:     ${currentO.y},
+  beta:      ${currentO.z},
+  timestamp: ${~~currentO.timestamp}
+}`
             this.last = current
         }
 
@@ -905,11 +850,13 @@ class StateGame extends Wakeable {
             // console.log(d);
             // consoel.l
 
-            let c = clamp(255)(parseInt(scale(255/2)(d)))
+            // let c = clamp(255)(parseInt(scale(255/2)(d)))
+            // let s = scale(d);
+            let s = Math.min(d / 2,1)
 
-            this.element.style.backgroundColor = colour(c)
+            this.element.style.backgroundColor = colour(s)
 
-            if(c > 254) lose()
+            if(s === 1) lose()
 
         }
 

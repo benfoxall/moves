@@ -14,6 +14,7 @@
       code {
         position: relative;
         overflow: visible;
+        -webkit-font-smoothing: antialiased;
       }
 
       .help-circle {
@@ -27,8 +28,10 @@
         position: absolute;
         height:48px;
         width:48px;
-        right:12px;
+        /*right:12px;*/
         top:-34px;
+        left: 50%;
+        margin-left:-24px;
 
         border: none;
         border-radius: 50%;
@@ -104,6 +107,18 @@
         transition: opacity .25s;
       }
 
+      #move_graph_bar {
+        display:block;
+        font-size: 2em;
+        padding:0;
+        background: #333;
+        width: 0;
+        height: 1em;
+        border-radius: 2px;
+        will-change: width;
+        margin: .5em 0;
+      }
+
       @media print {
         .help-move-hint, .help-touch-hint, .help-circle {
           display: none;
@@ -137,9 +152,9 @@
 
 <p>Hey, welcome back.</p>
 
-<p>We’re going to build a version that doesn’t have any Bach (so, just “Joust”), but using Javascript (so, “JoustJS”).  We’ll be displaying a colour on screen to show how much someone is moving, and if they move too much it’ll show that they’ve lost.</p>
+<p>We’re going to build a version that doesn’t have any Bach (so, just “Joust”), but using Javascript (so, “JoustJS”).  We'll show the player how far they've moved by changing the colour of their screen.  When they've moved too much, we'll show that they've lost.</p>
 
-<p><strong>Disclaimer time: <em>if you break your phone, it isn't my fault<!--, it was probably Olivers. -->.</em></strong></p>
+<p><strong>Disclaimer time: <em>if you break your phone, it was't my fault<!--, it was probably Olivers. -->.</em></strong></p>
 
 <h2>Detecting sudden movements</h2>
 
@@ -147,7 +162,7 @@
 
 <p>The rule we’re going to implement is: <strong>the cursor must cover no further than 300 pixels in 1.5 seconds.</strong></p>
 
-<p>First, we'll need to store the cursor position, so lets write some javascript:</p>
+<p>We need to store the cursor position, so lets write some javascript:</p>
 
 <pre><code>class Point {
   constructor (x, y, prev) {
@@ -186,21 +201,21 @@ move(
 
 <p class="help-touch-hint"><em>If you're on a touch device, drag from the circle above to prevent scrolling (it'll help you see what’s going on)</em></p>
 
-<p>Right, so this javascript looks kind of weird&hellip; That’s because we’re using class, let, and arrow function syntax from es2015.  At some point in the future (not 2015) this will be totally cool to use this in browsers, but for now it’s safest to transform it into es5 using a tool such as Babel.  To see an example of this kind of workflow (and the compiled es5 files) check out {{{LINK TO REPO}}}.</p>
+<p>This javascript looks kind of weird&hellip; That’s because we’re using class, let, and arrow function syntax from es2015.  At some point in the future (probably not 2015) it'll be totally cool to use this in browsers, but for now it’s safest to transform it into es5 using a tool such as Babel. <!-- To see an example of this kind of workflow (and the compiled es5 files) check out {{{LINK TO REPO}}}.--></p>
 
-<p>Back to the code - we’re only storing the most recent point, and linking the last point <strong>toward</strong> it in a <a href="https://en.wikipedia.org/wiki/Linked_list#Singly_linked_list">singly linked list</a>.  This means that we’ve got <strong>no way of accessing previous points</strong> - which is actually kinda good, because the browser can detect that, and garbage collect old data.</p>
+<p>As well as storing the pointer coordinates, we're storing the time that it was stored using <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now">performance.now()</a></code>, which allows us to check if the point happened in a particular timespan.</p>
 
-<p>When we do want to access data, we can store a reference to the current point, and now all subsequent points are accessible by traversing the <code>.next</code> property.</p>
+<p>We're also linking the last point <strong>toward</strong> the next, creating a <a href="https://en.wikipedia.org/wiki/Linked_list#Singly_linked_list">singly linked list</a>.  This means that we’ve got <strong>no way of accessing previous points</strong> - which is actually kinda good, because the browser can detect that, and garbage collect old data.</p>
+
+<p>When we do want to access the data, we can store a reference to the current point, and then any subsequent points are accessible by traversing the <code>.next</code> property.</p>
 
 
-
-<pre><code>
-function* points(p) {
+<pre><code>function* points(p) {
   do yield p
   while (p = p.next)
 }
 
-// the point in the past that we are starting from
+// our starting point
 let start;
 
 const render = (timestamp) => {
@@ -230,10 +245,10 @@ requestAnimationFrame(render)
 <ul>
   <li>`points` is a generator function which lets us traverse through our stored points in a `for … of` loop.</li>
   <li>We’re calling the render function with `requestAnimationFrame`, this means that the rendering will be called in sync with the browser refresh, and pause when the tab isn’t visible.</li>
-  <li>Also, our render function is being given a `timestamp` variable, this is the equivalent of calling `window.performance.now()`, which lets us compare to the timestamps generated in Point.</li>
+  <li>Our <code>render</code> function is being given a `timestamp` variable, this is the equivalent of calling `window.performance.now()`, which lets us compare to the timestamps generated in Point.</li>
 </ul>
 
-<p>Now that we’ve got access to this data, we can calculate how far the pointer has moved. We’ll define this as the diagonal length of the bounding box of points - that way it’s a bit more robust to wobbly/shaky input when we get to orientation
+<p>Now that we’ve got access to this data, we can calculate how far the pointer has moved. We’ll define this as the diagonal length of the bounding box of points - that way it’s a bit more robust to wobbly/shaky input.
 .</p>
 
 <pre><code data-key="move_calculation">const range = (points) => {
@@ -291,87 +306,92 @@ const distance (e) =>
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
+<p>Now we've got the distance, we can use it to implement our "too fast" rule.</p>
+
+<pre><code>// scale the distance, so we can use
+// different rules later
+const scale = (d) => Math.min(1, d / 300)
+
+const tooFast = (s) => s === 1
+
+/*<span data-key="move_graph"><span id="move_graph_text">
+* scaled: _
+* toFast: _</span>
+* <span id="move_graph_bar"></span>*/
+</code></pre>
+<div class="help-circle touch"><button data-help="touch"></button></div>
 
 <p>Great.</p>
 
-<p>Now we can use this to implement our rule of “a cursor must cover no further than 300 pixels in 1.5 seconds”:</p>
-
-
-<div data-key="move_graph">
-    <canvas height="150" width="150"></canvas>
-</div>
-<div class="help-circle touch"><button data-help="touch"></button></div>
-
-
-<p>Done.</p>
-
-
+<p>Now we've got the data we need for the game, we just need to display it to the user</p>
 
 <h2>Colours</h2>
 
-<p>Now want to take our movement and display it as a colour so the player can see if they’re moving too much. Because it’s christmas, we’ll go from green to red. </p>
+<p>Because it's christmas, we'll transition from green (all good) to red (too fast). We'll need a function that converts our distance to a colour.</p>
 
-<p>We can convert the distance into a colour by scaling it to 0 -> 255, {{TODO}}</p>
+<p>Colour interpolation can be kind of tricky; in our case, changing the rgb components of #f00 to #0f0 will result in a bit of a murky brown bit in the middle.</p>
+
+<p>One way around this is to use HSL colour space, varying the hue from green (120) to red (0) and keeping the brightness and saturation constant. This also means the colour will sweep through yellow and orange (which are also pretty christmassy).</p>
 
 
 <pre><code data-key="colour_calculation">
-let scale = a => b => a * b
-  // s = (255/300)(d) = <span id="colour_calculation_scale">0</span>
+const colour =
+  d => `hsl(${~~((1-d) * 120)}, 100%, 45%)`
 
-let clamp = max => d => Math.min(max, Math.max(0, d))
-  // i = (255)(~~s) = <span id="colour_calculation_clamp">0</span>
+/*
+* <span id="colour_calculation_colour">_</span>
+*
+<div id="colour_calculation_out" style="width:100%; height:150px;"> </div>
+*/</code></pre>
 
-let colour = i => `rgb(${i}, ${255-i}, 0)`
-  // (i) = <span id="colour_calculation_colour">0</span>
-
-// now we can take our distance and turn it into a colour
-colour(clamp(255)(parseInt(scale(100)(d))))
-
-</code></pre>
-
-
-<p id="colour_calculation_out" style="width:100%; height:150px;">
-</p>
 
 <p>Cool.</p>
 
 
 <h2>Movement</h2>
 
-<p>To detect movement - we’ll listen for DeviceOrientation events,  these have alpha, beta, gamma properties, which allow you find which way the device is pointing.  Super.</p>
+<p>Right, we've got all that stuff now - lets use it to track the movement of our device.</p>
+
+<p>We can listen for <code>deviceorientation</code> events in our browser.  This tells us which way the device is pointing through the event <code>gamma</code>, <code>alpha</code> &amp; <code>beta</code> properties.</p>
 
 
 <pre><code data-key="orientation_current">{
-  gamma: …
-  alpha: …
-  beta: …
+  gamma:     _,
+  alpha:     _,
+  beta:      _,
+  timestamp: _
 }</code></pre>
 
 <div class="help-circle move"><button data-help="move"></button></div>
 
-<p class="help-move-hint"><em>To fire some fake events, drag the red circle</em></p>
+<p class="help-move-hint"><em>To emulate some device orientation events, drag the red circle above</em></p>
+
+<p>We can use these properties to tell how far the device has rotated in the same way that we did before (with a little bit of updating to support a third property).</p>
 
 
-<p>We can slightly modify our Point, range, extent, and distance functions to deal with our new properties.</p>
-
-<pre><code>
-  // all the other stuff
+<pre><code>/*
+* orientation points:
 <canvas height="200" width="300" data-key="orientation_graph"></canvas>
+*
+* distance: …
+*/
 </code></pre>
 
 <div class="help-circle move"><button data-help="move"></button></div>
 
 
 
-<p>There’s a bit of a problem - when the alpha goes past 360 degrees, it’ll snap back to 0, which causes a big jump in distance, and makes us falsely detect a sudden movement.</p>
+<p>There’s a bit of a problem - when the alpha goes past 360 degrees, it’ll continue on from 0, which causes a big jump in distance, and makes us falsely detect a sudden movement.</p>
 
-<p>We can get around this by mapping our output values to wrap back to zero with something like:</p>
+<p>We can get around this by mapping our values to <code>0&rarr;2&Pi;</code>, then pressing the <code>Sin</code> key on our calculators.  This means that <code>0</code> &amp; <code>360</code> will both become <code>1</code>, and <code>180</code> will become <code>-1</code>.  It's not a terribly accurate, or good, approach - but it'll do the job.</p>
 
 
-<pre><code>const convert = p => ({
-    alpha: Math.sin(2*Math.PI*(p.alpha/360)),
-    beta:  Math.sin(2*Math.PI*(p.beta /360)),
-    gamma: Math.sin(2*Math.PI*(p.gamma/180))
+<pre><code>const PI2 = 2 * Math.PI
+
+const convert = p => ({
+    alpha: Math.sin(PI2 * (p.alpha / 360)),
+    beta:  Math.sin(PI2 * (p.beta  / 360)),
+    gamma: Math.sin(PI2 * (p.gamma / 180))
 })
 
 /*
@@ -384,21 +404,23 @@ colour(clamp(255)(parseInt(scale(100)(d))))
 
 <div class="help-circle move"><button data-help="move"></button></div>
 
-
+<p>Now our distance doesn't jump around.  Though it's a lot smaller than before (-1 -> 1), so we can update our `scale` function to reflect that.</p>
 
 <h2>Game state</h2>
 
-<p>We’ve got a game, but you can’t really lose or win.  For that we’ve got to add some state.</p>
+<p>It's not quite a game yet, for that we need to give players a way to start playing, and to lose.  We can think of this as a series of states:</p>
 
 <pre><code>[ready, started, lost]</code></pre>
 
-And there are (depressingly) only two transitions between these states:
+<p>And some transitions between the states:</p>
 
 <pre><code>[start, lose]</code></pre>
 
-<p>The absence of `won/win` is because our devices aren’t connected together, so we can’t really tell if only one person is left. Come along to [Frontier Conf](https://www.frontierconf.com/) in March, and I’ll show you how to do this.</p>
+<p><em>There's a depressing absence of `<code>won/win</code>` here. That's because our devices aren’t connected together, so we can’t really tell if there is anyone else left. I'll be talking about this bit at <a href="https://www.frontierconf.com/">Frontier Conf</a> in March - you should come along.</em></p>
 
-<p>We can model this game logic with something like:</p>
+<p>Now we've got the model
+
+  We can model this game logic with something like:</p>
 
 
 <pre><code>const READY = 1,
@@ -444,7 +466,13 @@ function lose () {
 <li>a cool little script by Max to change the heading colour to make the url bar awesome</li>
 <li>Vibrate and Audio feedback so you know when you’ve lost</li>
 <li>a service worker - to allow this to all happen offline.</li>
+<li>A big button to take you to it</li>
 </ul>
+
+
+
+
+
 
 <script src="es5/polyfill.js"></script>
 <script src="es5/story.js"></script>
