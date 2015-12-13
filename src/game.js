@@ -1,8 +1,6 @@
 
-
 class Orientation {
   constructor (gamma, alpha, beta, last) {
-
     this.gamma = gamma
     this.alpha = alpha
     this.beta = beta
@@ -10,7 +8,6 @@ class Orientation {
     this.timestamp = window.performance.now()
 
     if (last) last.next = this
-
   }
 }
 
@@ -82,14 +79,14 @@ let state = READY
 
 const button = document.getElementsByTagName('button')[0];
 
-const start = () => {
+const _start = () => {
   if(state & READY | LOST) {
     state = STARTED
     button.className = 'hidden'
   }
 }
 
-const lose = () => {
+const _lose = () => {
   if(state & STARTED) {
     state = LOST;
     button.className = ''
@@ -116,8 +113,19 @@ window.addEventListener('deviceorientation', e => {
 
 
 
-// render points
+// track point 1.5s ago
 let first = null
+
+const traverse = timestamp => {
+
+  if(!current) return
+
+  for(first of points(first || current))
+    if(first.timestamp > timestamp - 1500)
+      break
+}
+
+
 
 // handy to save distance for other stuff
 let _distance = 0;
@@ -125,53 +133,50 @@ let _distance = 0;
 let _first, _current;
 
 const render = timestamp => {
-  requestAnimationFrame(render)
 
-  if(!current) return
+  // if there is no start point, or game has been lost
+  if(!first || state & LOST) return
 
-  for(first of points(first || current))
-    if(first.timestamp > timestamp - 1500)
-      break
-
-  if(state & LOST) return;
 
   // optimisation to not have to redraw same thing
   if((_first == first) && (_current == current)) return
   [_first, _current] = [first, current]
 
 
-  const d = distance(
-    extent(
-      range(
-        points(
-          first
+  const d = scale(
+    distance(
+      extent(
+        range(
+          points(
+            first
+          )
         )
       )
     )
   )
-  // console.log(d)
 
-  const c = scale(d);
-  console.log(c, d)
+  document.body.style.background = colour(d)
 
-  document.body.style.background = colour(c);
-
-  if(tooFast(c)) lose();
-
-  // if(c > 254) lose();
-
-  //console.log(d, c)
-
+  if(tooFast(d)) _lose()
 
 }
 
+
+
+const loop = (timestamp) => {
+  requestAnimationFrame(loop)
+  traverse(timestamp)
+  render(timestamp)
+}
+
+requestAnimationFrame(traverse);
 
 requestAnimationFrame(render);
 
 
 const handle = e => {
   e.preventDefault()
-  start()
+  _start()
 }
 
 button.addEventListener('click', handle, false)

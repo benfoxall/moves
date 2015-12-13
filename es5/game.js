@@ -133,14 +133,14 @@ var state = READY;
 
 var button = document.getElementsByTagName('button')[0];
 
-var start = function start() {
+var _start = function _start() {
   if (state & READY | LOST) {
     state = STARTED;
     button.className = 'hidden';
   }
 };
 
-var lose = function lose() {
+var _lose = function _lose() {
   if (state & STARTED) {
     state = LOST;
     button.className = '';
@@ -156,17 +156,10 @@ window.addEventListener('deviceorientation', function (e) {
   }
 });
 
-// render points
+// track point 1.5s ago
 var first = null;
 
-// handy to save distance for other stuff
-var _distance = 0;
-
-var _first = undefined,
-    _current = undefined;
-
-var render = function render(timestamp) {
-  requestAnimationFrame(render);
+var traverse = function traverse(timestamp) {
 
   if (!current) return;
 
@@ -194,34 +187,44 @@ var render = function render(timestamp) {
       }
     }
   }
+};
 
-  if (state & LOST) return;
+// handy to save distance for other stuff
+var _distance = 0;
+
+var _first = undefined,
+    _current = undefined;
+
+var render = function render(timestamp) {
+
+  // if there is no start point, or game has been lost
+  if (!first || state & LOST) return;
 
   // optimisation to not have to redraw same thing
   if (_first == first && _current == current) return;
   _first = first;
   _current = current;
 
-  var d = distance(extent(range(points(first))));
-  // console.log(d)
+  var d = scale(distance(extent(range(points(first)))));
 
-  var c = scale(d);
-  console.log(c, d);
+  document.body.style.background = colour(d);
 
-  document.body.style.background = colour(c);
-
-  if (tooFast(c)) lose();
-
-  // if(c > 254) lose();
-
-  //console.log(d, c)
+  if (tooFast(d)) _lose();
 };
+
+var loop = function loop(timestamp) {
+  requestAnimationFrame(loop);
+  traverse(timestamp);
+  render(timestamp);
+};
+
+requestAnimationFrame(traverse);
 
 requestAnimationFrame(render);
 
 var handle = function handle(e) {
   e.preventDefault();
-  start();
+  _start();
 };
 
 button.addEventListener('click', handle, false);
