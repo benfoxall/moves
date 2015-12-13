@@ -178,7 +178,7 @@
 }
 
 // store the most recent point
-let current = null;
+let current = null
 
 // helper function for adding mouse/touch
 // move listeners
@@ -216,26 +216,23 @@ move(
 }
 
 // our starting point
-let start;
+let start = null
 
-const render = (timestamp) => {
-  requestAnimationFrame(render)
+const traverse = (timestamp) => {
+  requestAnimationFrame(traverse)
 
   if (!current) return
-  if (!start) start = current
 
-  // move forward in the list until we are
+  // move forward until we are
   // within 1.5 seconds of now
-  for(start of points(start))
+  for(start of points(start || current))
     if(past.timestamp > timestamp - 1500)
       break
-
-  /* points(start):
-<div data-key="move_list"><canvas height="200" width="500"></canvas></div>
-  */
 }
+requestAnimationFrame(traverse)
 
-requestAnimationFrame(render)
+/**
+* points(start):<div data-key="move_list"><canvas height="200" width="500"></canvas></div>*/
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
@@ -327,7 +324,7 @@ const tooFast = (s) => s === 1
 
 <h2>Colours</h2>
 
-<p>Because it's christmas, we'll transition from green (all good) to red (too fast). We'll need a function that converts our distance to a colour.</p>
+<p>Because it's christmas, the transition will be from green (all good) to red (too fast). We'll need a function that converts our distance to a colour.</p>
 
 <p>Colour interpolation can be kind of tricky; in our case, changing the rgb components of #f00 to #0f0 will result in a bit of a murky brown bit in the middle.</p>
 
@@ -366,7 +363,7 @@ const colour =
 
 <p class="help-move-hint"><em>To emulate some device orientation events, drag the red circle above</em></p>
 
-<p>We can use these properties to tell how far the device has rotated in the same way that we did before (with a little bit of updating to support a third property).</p>
+<p>We can use these properties to tell how far the device has rotated with the same functions we had before that we did before (with a little bit of updating to support a third property).</p>
 
 
 <pre><code>/*
@@ -381,9 +378,9 @@ const colour =
 
 
 
-<p>There’s a bit of a problem - when the alpha goes past 360 degrees, it’ll continue on from 0, which causes a big jump in distance, and makes us falsely detect a sudden movement.</p>
+<p>There’s a problem - when the alpha goes past 360 degrees, it’ll continue on from 0, which causes a big jump in distance, and makes us falsely detect a sudden movement.</p>
 
-<p>We can get around this by mapping our values to <code>0&rarr;2&Pi;</code>, then pressing the <code>Sin</code> key on our calculators.  This means that <code>0</code> &amp; <code>360</code> will both become <code>1</code>, and <code>180</code> will become <code>-1</code>.  It's not a terribly accurate, or good, approach - but it'll do the job.</p>
+<p>We can get around this by mapping our values to <code>0&rarr;2&Pi;</code>, then pressing the <code>Math.Sin</code> key on our calculators.  This means that <code>0</code> &amp; <code>360</code> will both become <code>1</code>, and <code>180</code> will become <code>-1</code>.  It's not a terribly great approach for a number of reasons - but it'll do the job.</p>
 
 
 <pre><code>const PI2 = 2 * Math.PI
@@ -453,9 +450,11 @@ function lose () {
 <p></p>
 <div class="help-circle move"><button data-help="move"></button></div>
 
-<h2>The rest of the owl</h2>
 
-<p>We’ve got all this logic, now we can stick it all together and get a game:</p>
+<p>done!</p>
+
+
+<h2>The rest of the owl</h2>
 
 
 <p>Now we can add some more stuff:</p>

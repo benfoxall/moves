@@ -900,13 +900,7 @@ class OrientationConvert extends Wakeable {
       this.element.textContent = `
 *   gamma = ${c.x}
 *   alpha = ${c.y}
-*   beta  = ${c.z}` + `
-
-WAS
-*   gamma = ${currentO.x}
-*   alpha = ${currentO.y}
-*   beta  = ${currentO.z}`
-
+*   beta  = ${c.z}`
     }
 
     sleep(){

@@ -1211,7 +1211,7 @@ var OrientationConvert = (function (_Wakeable7) {
 
       var c = convert(currentO);
 
-      this.element.textContent = '\n*   gamma = ' + c.x + '\n*   alpha = ' + c.y + '\n*   beta  = ' + c.z + ('\n\nWAS\n*   gamma = ' + currentO.x + '\n*   alpha = ' + currentO.y + '\n*   beta  = ' + currentO.z);
+      this.element.textContent = '\n*   gamma = ' + c.x + '\n*   alpha = ' + c.y + '\n*   beta  = ' + c.z;
     }
   }, {
     key: 'sleep',
