@@ -150,17 +150,17 @@
 
 <p>We’re going to make a game!</p>
 
-<p>Our game is going to be based on <a href="http://www.jsjoust.com/">JSJoust</a>; where players have a controller which they keep still as possible whilst trying to force other players to move theirs.  It’s all done in time to Johann Sebastian Bach (hence the JS).</p>
+<p>Our game is going to be based on <a href="http://www.jsjoust.com/">JSJoust</a>; where players have a controller which they keep as still as possible, whilst trying to force other players to move theirs.  It’s all done in time to Johann Sebastian Bach (hence the JS).</p>
 
 <img src="assets/jsjoust.jpg" alt="players holding controllers, trying to push each other over" />
 
-<p>You should definitely check it out.  In fact, if you stop reading this post, and go looking for some PS Move controllers to play it - I’d definitely count that as a success.</p>
+<p>You should definitely <a href="http://www.jsjoust.com/">check it out</a>.  In fact, if you stop reading this post, and go looking for some PS Move controllers to play it - I’d definitely count that as a success.</p>
 
 <p>Hey, welcome back.</p>
 
 <p>We’re going to build a version that doesn’t have any Bach (so, just “Joust”), but using Javascript (so, “JoustJS”).  We'll show the player how far they've moved by changing the colour of their screen.  When they've moved too much, we'll show that they've lost.</p>
 
-<p><strong>Disclaimer time: <em>if you break your phone, it was't my fault<!--, it was probably Olivers. -->.</em></strong></p>
+<p><strong>Disclaimer time: <em>if you break your phone, it wasn’t my fault<!--, it was probably Olivers. -->.</em></strong></p>
 
 <h2>Detecting sudden movements</h2>
 
@@ -207,7 +207,7 @@ move(
 
 <p class="help-touch-hint"><em>If you're on a touch device, drag from the circle above to prevent scrolling (it'll help you see what’s going on)</em></p>
 
-<p>This javascript looks kind of weird&hellip; That’s because we’re using class, let, and arrow function syntax from es2015.  At some point in the future (probably not 2015) it'll be totally cool to use this in browsers, but for now it’s safest to transform it into es5 using a tool such as Babel. <!-- To see an example of this kind of workflow (and the compiled es5 files) check out {{{LINK TO REPO}}}.--></p>
+<p>This javascript looks kind of weird&hellip; That’s because we’re using <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Classes">class</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let">let</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">arrow function</a> syntax from es2015.  At some point in the future (probably not 2015) it'll be totally cool to use this in browsers, but for now it’s safest to transform it into es5 using a tool such as <a href="https://babeljs.io/">Babel</a>. <!-- To see an example of this kind of workflow (and the compiled es5 files) check out {{{LINK TO REPO}}}.--></p>
 
 <p>As well as storing the pointer coordinates, we're storing the time that it was stored using <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now">performance.now()</a></code>, which allows us to check if the point happened in a particular timespan.</p>
 
@@ -308,7 +308,7 @@ const distance (e) =>
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
-<p>We can now use this distance to implement our "too fast" rule, first scaling it, so that we can use it with other distance values later.</p>
+<p>We can now implement our "too fast" rule, first scaling the distance so that we can use it with other distance values later.</p>
 
 <pre><code>
 const scale = (d) => Math.min(1, d / 300)
@@ -367,7 +367,7 @@ const colour =
 
 <p class="help-move-hint"><em>To emulate some device orientation events, drag the red circle above</em></p>
 
-<p>We can use these properties to tell how far the device has rotated with the same functions we had before that we did before (with a little bit of updating to support a third property).</p>
+<p>We can use these properties to tell how far the device has rotated with the same functions we had before (with a little bit of updating to support a third property).</p>
 
 
 <pre><code>/*
@@ -453,7 +453,7 @@ function lose () {
 <div class="help-circle move"><button data-help="move"></button></div>
 
 
-<p>done!</p>
+<p>Done!</p>
 
 
 <h2>The rest of the owl</h2>
