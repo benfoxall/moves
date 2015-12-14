@@ -485,8 +485,8 @@ class MoveGraph  extends Wakeable {
             let t = tooFast(sc);
 
             this.el_text.textContent = `
-* scaled: ${sc}
-* toFast: ${t ? 'true': 'false'}`
+* scaled:  ${sc}
+* tooFast: ${t ? 'true': 'false'}`
 
             this.el_bar.style.width = (sc*100) + '%'
             this.el_bar.style.background = t ? 'red' : '#333';

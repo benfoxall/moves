@@ -603,7 +603,7 @@ var MoveGraph = (function (_Wakeable) {
         var sc = scale(d);
         var t = tooFast(sc);
 
-        this.el_text.textContent = '\n* scaled: ' + sc + '\n* toFast: ' + (t ? 'true' : 'false');
+        this.el_text.textContent = '\n* scaled:  ' + sc + '\n* tooFast: ' + (t ? 'true' : 'false');
 
         this.el_bar.style.width = sc * 100 + '%';
         this.el_bar.style.background = t ? 'red' : '#333';
