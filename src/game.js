@@ -18,27 +18,27 @@ function* points(p) {
 }
 
 
-const range = (points) => {
+const range = (start) => {
 
-    let g_min, g_max, a_min, a_max, b_min, b_max, first = true;
+    let g_min, g_max, a_min, a_max, b_min, b_max, first = true
 
-    for(let n of points) {
+    for(let p of start) {
         if(first){
-            g_min = g_max = n.gamma
-            a_min = a_max = n.alpha
-            b_min = b_max = n.beta
+            g_min = g_max = p.gamma
+            a_min = a_max = p.alpha
+            b_min = b_max = p.beta
             first = false
             continue
         }
 
-        if (n.gamma < g_min) {g_min = n.gamma}
-        else if (n.gamma > g_max ) {g_max = n.gamma}
+        if (p.gamma < g_min) {g_min = p.gamma}
+        else if (p.gamma > g_max ) {g_max = p.gamma}
 
-        if (n.alpha < a_min) {a_min = n.alpha}
-        else if (n.alpha > a_max) {a_max = n.alpha}
+        if (p.alpha < a_min) {a_min = p.alpha}
+        else if (p.alpha > a_max) {a_max = p.alpha}
 
-        if (n.beta < b_min) {b_min = n.beta}
-        else if (n.beta > b_max) {b_max = n.beta}
+        if (p.beta < b_min) {b_min = p.beta}
+        else if (p.beta > b_max) {b_max = p.beta}
     }
 
     return {
@@ -66,18 +66,21 @@ const distance = (e) =>
     Math.pow(e.beta, 2)
   )
 
-
+// scale by .5 and limit to <1
 const scale = (d) => Math.min(1, d/2)
 
-const tooFast = (s) => s === 1
+const tooFast = (s) => s >= 1
 
-const colour = i => `hsl(${~~((1-i) * 120)}, 100%, 45%)`
+const hue = d => (1-d) * 120
+
+const colour = h => `hsl(${~~hue(h)}, 100%, 45%)`
 
 
 const READY = 1, STARTED = 2, LOST = 4
 let state = READY
 
-const button = document.getElementsByTagName('button')[0];
+const button = document.getElementsByTagName('button')[0]
+
 
 const _start = () => {
   if(state & READY | LOST) {
@@ -86,13 +89,13 @@ const _start = () => {
   }
 }
 
+
 const _lose = () => {
   if(state & STARTED) {
-    state = LOST;
+    state = LOST
     button.className = ''
   }
 }
-
 
 
 
@@ -109,8 +112,7 @@ window.addEventListener('deviceorientation', e => {
         current
       )
   }
-});
-
+})
 
 
 // track point 1.5s ago
@@ -126,16 +128,14 @@ const traverse = timestamp => {
 }
 
 
-
 // handy to save distance for other stuff
-let _distance = 0;
+let _distance = 0
 
-let _first, _current;
+let _first, _current
 
 const render = timestamp => {
-
   // if there is no start point, or game has been lost
-  if(!first || state & LOST) return
+  if(!first) return
 
 
   // optimisation to not have to redraw same thing
@@ -162,18 +162,16 @@ const render = timestamp => {
 }
 
 
-
 const loop = (timestamp) => {
   requestAnimationFrame(loop)
   traverse(timestamp)
   render(timestamp)
 }
 
-requestAnimationFrame(traverse);
-
-requestAnimationFrame(render);
+requestAnimationFrame(loop)
 
 
+// hook up button
 const handle = e => {
   e.preventDefault()
   _start()

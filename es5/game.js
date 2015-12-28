@@ -36,7 +36,7 @@ function points(p) {
   }, _marked[0], this);
 }
 
-var range = function range(points) {
+var range = function range(start) {
 
   var g_min = undefined,
       g_max = undefined,
@@ -51,33 +51,33 @@ var range = function range(points) {
   var _iteratorError = undefined;
 
   try {
-    for (var _iterator = points[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var n = _step.value;
+    for (var _iterator = start[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var p = _step.value;
 
       if (first) {
-        g_min = g_max = n.gamma;
-        a_min = a_max = n.alpha;
-        b_min = b_max = n.beta;
+        g_min = g_max = p.gamma;
+        a_min = a_max = p.alpha;
+        b_min = b_max = p.beta;
         first = false;
         continue;
       }
 
-      if (n.gamma < g_min) {
-        g_min = n.gamma;
-      } else if (n.gamma > g_max) {
-        g_max = n.gamma;
+      if (p.gamma < g_min) {
+        g_min = p.gamma;
+      } else if (p.gamma > g_max) {
+        g_max = p.gamma;
       }
 
-      if (n.alpha < a_min) {
-        a_min = n.alpha;
-      } else if (n.alpha > a_max) {
-        a_max = n.alpha;
+      if (p.alpha < a_min) {
+        a_min = p.alpha;
+      } else if (p.alpha > a_max) {
+        a_max = p.alpha;
       }
 
-      if (n.beta < b_min) {
-        b_min = n.beta;
-      } else if (n.beta > b_max) {
-        b_max = n.beta;
+      if (p.beta < b_min) {
+        b_min = p.beta;
+      } else if (p.beta > b_max) {
+        b_max = p.beta;
       }
     }
   } catch (err) {
@@ -114,16 +114,21 @@ var distance = function distance(e) {
   return Math.sqrt(Math.pow(e.gamma, 2) + Math.pow(e.alpha, 2) + Math.pow(e.beta, 2));
 };
 
+// scale by .5 and limit to <1
 var scale = function scale(d) {
   return Math.min(1, d / 2);
 };
 
 var tooFast = function tooFast(s) {
-  return s === 1;
+  return s >= 1;
 };
 
-var colour = function colour(i) {
-  return 'hsl(' + ~ ~((1 - i) * 120) + ', 100%, 45%)';
+var hue = function hue(d) {
+  return (1 - d) * 120;
+};
+
+var colour = function colour(h) {
+  return 'hsl(' + ~ ~hue(h) + ', 100%, 45%)';
 };
 
 var READY = 1,
@@ -196,9 +201,8 @@ var _first = undefined,
     _current = undefined;
 
 var render = function render(timestamp) {
-
   // if there is no start point, or game has been lost
-  if (!first || state & LOST) return;
+  if (!first) return;
 
   // optimisation to not have to redraw same thing
   if (_first == first && _current == current) return;
@@ -218,10 +222,9 @@ var loop = function loop(timestamp) {
   render(timestamp);
 };
 
-requestAnimationFrame(traverse);
+requestAnimationFrame(loop);
 
-requestAnimationFrame(render);
-
+// hook up button
 var handle = function handle(e) {
   e.preventDefault();
   _start();
