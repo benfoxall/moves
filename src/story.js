@@ -122,7 +122,7 @@ let distance = (e) =>
 
 const scale = (d) => Math.min(1, d / 300)
 
-const tooFast = (s) => s === 1
+const tooFar = (s) => s === 1
 
 const colour = i => `hsl(${~~((1-i) * 120)}, 100%, 45%)`
 
@@ -482,11 +482,11 @@ class MoveGraph  extends Wakeable {
             // console.log(r,e,d)
 
             let sc = scale(d);
-            let t = tooFast(sc);
+            let t = tooFar(sc);
 
             this.el_text.textContent = `
 * scaled:  ${sc}
-* tooFast: ${t ? 'true': 'false'}`
+* tooFar: ${t ? 'true': 'false'}`
 
             this.el_bar.style.width = (sc*100) + '%'
             this.el_bar.style.background = t ? 'red' : '#333';

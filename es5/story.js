@@ -158,7 +158,7 @@ var scale = function scale(d) {
   return Math.min(1, d / 300);
 };
 
-var tooFast = function tooFast(s) {
+var tooFar = function tooFar(s) {
   return s === 1;
 };
 
@@ -601,9 +601,9 @@ var MoveGraph = (function (_Wakeable) {
         // console.log(r,e,d)
 
         var sc = scale(d);
-        var t = tooFast(sc);
+        var t = tooFar(sc);
 
-        this.el_text.textContent = '\n* scaled:  ' + sc + '\n* tooFast: ' + (t ? 'true' : 'false');
+        this.el_text.textContent = '\n* scaled:  ' + sc + '\n* tooFar: ' + (t ? 'true' : 'false');
 
         this.el_bar.style.width = sc * 100 + '%';
         this.el_bar.style.background = t ? 'red' : '#333';

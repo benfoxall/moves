@@ -148,19 +148,19 @@
 
 <hr />
 
-<p>We’re going to make a game!</p>
+<h1>JavaScript Jousting</h1>
+
+<p>Today we're going to make a game!</p>
 
 <p>Our game is going to be based on <a href="http://www.jsjoust.com/">JSJoust</a>; where players have a controller which they keep as still as possible, whilst trying to force other players to move theirs.  It’s all done in time to Johann Sebastian Bach (hence the JS).</p>
 
 <img src="assets/jsjoust.jpg" alt="players holding controllers, trying to push each other over" />
 
-<p>You should definitely <a href="http://www.jsjoust.com/">check it out</a>.  In fact, if you stop reading this post, and go looking for some PS Move controllers to play it - I’d definitely count that as a success.</p>
-
-<p>Hey, welcome back.</p>
+<p>You should definitely <a href="http://www.jsjoust.com/">check it out</a>.  In fact, if you stop reading this post, and go looking for some <a href="https://en.wikipedia.org/wiki/PlayStation_Move">PS Move</a> controllers to play it - I’d definitely count that as a success.</p>
 
 <p>We’re going to build a version that doesn’t have any Bach (so, just “Joust”), but using Javascript (so, “JoustJS”).  We'll show the player how far they've moved by changing the colour of their screen.  When they've moved too much, we'll show that they've lost.</p>
 
-<p><strong>Disclaimer time: <em>if you break your phone, it wasn’t my fault<!--, it was probably Olivers. -->.</em></strong></p>
+<p><strong>Disclaimer time: <em>if you break your phone, it wasn’t my fault<!--, it was probably Oliver. -->.</em></strong></p>
 
 <h2>Detecting sudden movements</h2>
 
@@ -176,7 +176,7 @@
     this.x = x
     this.y = y
 
-    this.timestamp = window.performance.now()
+    this.timestamp = performance.now()
 
     if (prev) prev.next = this
 
@@ -186,8 +186,8 @@
 // store the most recent point
 let current = null
 
-// helper function for adding mouse/touch
-// move listeners
+// listen for pointer move events
+// (`move` is a helper function)
 move(
   (x, y) => {
     current = new Point(x, y, current)
@@ -211,9 +211,12 @@ move(
 
 <p>As well as storing the pointer coordinates, we're storing the time that it was stored using <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now">performance.now()</a></code>, which allows us to check if the point happened in a particular timespan.</p>
 
-<p>We're also linking the last point <strong>toward</strong> the next, creating a <a href="https://en.wikipedia.org/wiki/Linked_list#Singly_linked_list">singly linked list</a>.  This means that we’ve got <strong>no way of accessing previous points</strong> - which is actually kinda good, because the browser can detect that, and garbage collect old data.</p>
 
-<p>When we do want to access the data, we can store a reference to the current point, and then any subsequent points are accessible by traversing the <code>.next</code> property.</p>
+<p>We're storing the point as <code>current</code>, though we're also passing the previous point to it as an argument</p>
+
+<p>If you look at the constructor of <code>Point</code>, you can see that we're linking the last point <strong>toward the new one</strong>, which means that we’ve got <strong>no way of accessing previous points</strong> (the <code>.next</code> property of <code>current</code> will be <code>undefined</code>). This is pretty cool, because the browser can detect that, and garbage collect old data.</p>
+
+<p>When we do want to store the data, we can hold a reference to a point, and when any subsequent points added, they're accessible by traversing the <code>.next</code> property.</p>
 
 
 <pre><code>function* points(p) {
@@ -238,7 +241,7 @@ const traverse = (timestamp) => {
 requestAnimationFrame(traverse)
 
 /**
-* points(start):<div data-key="move_list"><canvas height="200" width="500"></canvas></div>*/
+* start &rarr; current:<div data-key="move_list"><canvas height="200" width="500"></canvas></div>*/
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
@@ -246,12 +249,12 @@ requestAnimationFrame(traverse)
 <p>Right. Some things:</p>
 
 <ul>
-  <li>`points` is a generator function which lets us traverse through our stored points in a `for … of` loop.</li>
-  <li>We’re calling the render function with `requestAnimationFrame`, this means that the rendering will be called in sync with the browser refresh, and pause when the tab isn’t visible.</li>
-  <li>Our <code>render</code> function is being given a `timestamp` variable, this is the equivalent of calling `window.performance.now()`, which lets us compare to the timestamps generated in Point.</li>
+  <li>We've made a generator function (<code>points</code>), which will let us iterate through our stored points in a <code>for&hellip;of</code> loop.</li>
+  <li>We’re calling the <code>traverse</code> function with <code>requestAnimationFrame</code>, this calls it in time with the browser refresh rate (and pauses when the page is minimized/hidden).
+  <li><code>requestAnimationFrame</code> also passes a <code>timestamp</code> value, which kind of the equivelant of calling <code>performance.now()</code>; allowing us to compare to the timestamps generated in Point.</li>
 </ul>
 
-<p>Now that we’ve got access to this data, we can calculate how far the pointer has moved. We’ll define this as the diagonal length of the bounding box of points - that way it’s a bit more robust to wobbly/shaky input.</p>
+<p>Now that we’ve got access to the last 1.5 seconds of points, we can calculate how far the pointer has moved. We’ll define this as the diagonal length of the bounding box of points - that way it’s a bit more robust to wobbly/shaky input.</p>
 
 <pre><code data-key="move_calculation">const range = (points) => {
 
@@ -308,16 +311,17 @@ const distance (e) =>
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
-<p>We can now implement our "too fast" rule, first scaling the distance so that we can use it with other distance values later.</p>
+<p>We can now implement our "too far" rule, first scaling and limiting the distance so that it's a bit handier to play with.</p>
 
 <pre><code>
-const scale = (d) => Math.min(1, d / 300)
+const scale = (d) => d / 300
+const limit = Math.min.bind(null, 1)
 
-const tooFast = (s) => s >= 1
+const tooFar = (s) => s >= 1
 
 /*<span data-key="move_graph"><span id="move_graph_text">
 * scaled: _
-* toFast: _</span>
+* tooFar: _</span>
 * <span id="move_graph_bar"></span>*/
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
@@ -330,14 +334,18 @@ const tooFast = (s) => s >= 1
 
 <p>Because it's christmas, the transition will be from green (all good) to red (too fast). We'll need a function that converts our distance to a colour.</p>
 
-<p>Colour interpolation can be kind of tricky; in our case, changing the rgb components of #f00 to #0f0 will result in a bit of a murky brown bit in the middle.</p>
+<p>Colour interpolation can be kind of tricky; in our case, changing the rgb components of <code>#f00</code> to <code>#0f0</code> will result in a bit of a murky brown bit in the middle.</p>
 
 <p>One way to deal with this is to use HSL colours, varying the hue from green (120) to red (0) and keeping the brightness and saturation constant. This also means the colour will sweep through yellow and orange (which are also pretty christmassy).</p>
 
 
-<pre><code data-key="colour_calculation">
+<pre><code data-key="colour_calculation">// map [0,1] to [120,0]
+const hue = d => (1-d) * 120
+
+// use string interpolation to
+// return our colour
 const colour =
-  d => `hsl(${~~((1-d) * 120)}, 100%, 45%)`
+  d => `hsl(${~~hue(d)}, 100%, 45%)`
 
 /*
 * <span id="colour_calculation_colour">_</span>
@@ -406,7 +414,7 @@ const convert = p => ({
 
 <div class="help-circle move"><button data-help="move"></button></div>
 
-<p>Now our distance doesn't jump around.  Though it's a lot smaller than before (-1 -> 1), so we can update our `scale` function to reflect that.</p>
+<p>Now our distance doesn't jump around.  Though it's a lot smaller than before (from <code>-1</code> to <code>1</code>), so we can update our `scale` function to reflect that.</p>
 
 <h2>Game state</h2>
 
