@@ -1239,14 +1239,11 @@ var sections = Array.from(document.querySelectorAll('[data-key]')).map(function 
 });
 
 // debug
-(function (failed) {
-  if (!failed.length) return;
-  console.log("missing implementation: ", failed.join(', '));
-})(sections.filter(function (s) {
-  return !s.fn;
-}).map(function (s) {
-  return s.key;
-}));
+// ((failed) => {
+//     if(!failed.length) return;
+//     console.log("missing implementation: ", failed.join(', '))
+//
+// })(sections.filter( s => !s.fn ).map( s => s.key ));
 
 var active = [];
 
@@ -1284,8 +1281,12 @@ function setScroll() {
 window.addEventListener('resize', setScroll, false);
 window.addEventListener('scroll', setScroll, false);
 
+var disabled = false;
+
 function render(t) {
   requestAnimationFrame(render);
+
+  if (disabled) return;
 
   updateActive();
 
@@ -1294,7 +1295,7 @@ function render(t) {
   });
 }
 
-render(window.performance.now());
+requestAnimationFrame(render);
 
 var on = function on(obj, name, fn) {
   return obj.addEventListener(name, fn, false);
@@ -1448,7 +1449,18 @@ var disableMoveHelpCircles = function disableMoveHelpCircles(e) {
   off(document, 'mousedown', moveHelp);
   off(document, 'touchstart', moveHelpT);
 
-  console.log(h);
+  // console.log(h)
   if (h) window.scrollBy(0, -h - 22);
 };
 on(window, 'deviceorientation', disableMoveHelpCircles);
+
+// disable interactiveness
+
+var disableInput = document.getElementById('disable-jjs');
+var updateDisabled = function updateDisabled() {
+  disabled = disableInput.checked;
+};
+
+on(disableInput, 'change', updateDisabled);
+
+updateDisabled();

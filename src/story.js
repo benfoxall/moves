@@ -936,11 +936,11 @@ const sections = Array.from(document.querySelectorAll('[data-key]'))
 
 
 // debug
-((failed) => {
-    if(!failed.length) return;
-    console.log("missing implementation: ", failed.join(', '))
-
-})(sections.filter( s => !s.fn ).map( s => s.key ));
+// ((failed) => {
+//     if(!failed.length) return;
+//     console.log("missing implementation: ", failed.join(', '))
+//
+// })(sections.filter( s => !s.fn ).map( s => s.key ));
 
 
 
@@ -986,9 +986,12 @@ window.addEventListener('resize', setScroll, false)
 window.addEventListener('scroll', setScroll, false)
 
 
+let disabled = false;
 
 function render(t){
     requestAnimationFrame(render)
+
+    if(disabled) return
 
     updateActive();
 
@@ -996,10 +999,9 @@ function render(t){
         if(s.fn) s.fn.render(t, s.element)
     })
 
-
 }
 
-render(window.performance.now());
+requestAnimationFrame(render)
 
 const on = (obj, name, fn) =>
   obj.addEventListener(name, fn, false)
@@ -1160,7 +1162,18 @@ let disableMoveHelpCircles = (e) => {
   off(document, 'mousedown', moveHelp)
   off(document, 'touchstart', moveHelpT)
 
-  console.log(h)
+  // console.log(h)
   if(h) window.scrollBy(0, - h - 22)
 }
 on(window, 'deviceorientation', disableMoveHelpCircles);
+
+
+
+// disable interactiveness
+
+const disableInput = document.getElementById('disable-jjs')
+const updateDisabled = () => {disabled = disableInput.checked}
+
+on(disableInput, 'change', updateDisabled)
+
+updateDisabled()

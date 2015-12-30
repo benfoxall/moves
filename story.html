@@ -131,6 +131,17 @@
         }
       }
 
+      .code-warning {
+        display:block;
+        background: #ccc;
+        border-radius: 10px;
+        margin: 1em;
+        padding: 1em;
+      }
+      .code-warning input {
+        font-size: 1em
+      }
+
     </style>
 
   </head>
@@ -149,6 +160,11 @@
 <hr />
 
 <h1>JavaScript Jousting</h1>
+
+<label class="code-warning">
+  <input type="checkbox" id="disable-jjs" />
+  disable interactive code examples
+</label>
 
 <p>Today we're going to make a game!</p>
 
