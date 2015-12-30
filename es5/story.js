@@ -385,7 +385,7 @@ var MoveList = (function () {
 
     this.awake = false;
 
-    this.canvas = element.querySelector('canvas');
+    this.canvas = element; //.querySelector('canvas');
     this.ctx = this.canvas.getContext('2d');
   }
 
@@ -1230,13 +1230,41 @@ implementation.orientation_convert = function (el) {
 
 // Hook into the sections of the page, only firing implementations when visible
 
-var sections = Array.from(document.querySelectorAll('[data-key]')).map(function (e) {
-  return {
-    element: e,
-    key: e.dataset.key,
-    fn: implementation[e.dataset.key] && implementation[e.dataset.key](e)
-  };
-});
+var sections = [];
+
+// sections in view
+var active = [];
+// whether the active list needs updating
+var _needs_update = undefined;
+
+var assignSections = function assignSections() {
+  sections = Array.from(document.querySelectorAll('[data-key]')).map(function (e) {
+    return {
+      element: e,
+      key: e.dataset.key,
+      fn: implementation[e.dataset.key] && implementation[e.dataset.key](e)
+    };
+  });
+  _needs_update = true;
+};
+
+if (window.Prism) {
+  (function () {
+
+    // same as Prism.highlightAll, but with a single callback at end
+    var elements = document.querySelectorAll('code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code');
+
+    var count = elements.length;
+
+    for (var i = 0, element; element = elements[i++];) {
+      Prism.highlightElement(element, false, function () {
+        if (! --count) assignSections();
+      });
+    }
+  })();
+} else {
+  assignSections();
+}
 
 // debug
 // ((failed) => {
@@ -1244,11 +1272,6 @@ var sections = Array.from(document.querySelectorAll('[data-key]')).map(function 
 //     console.log("missing implementation: ", failed.join(', '))
 //
 // })(sections.filter( s => !s.fn ).map( s => s.key ));
-
-var active = [];
-
-// whether the active list needs updating
-var _needs_update = true;
 
 function updateActive() {
   if (!_needs_update) return;

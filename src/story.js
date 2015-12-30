@@ -334,7 +334,7 @@ class MoveList {
     constructor(element) {
         this.awake = false;
 
-        this.canvas = element.querySelector('canvas');
+        this.canvas = element;//.querySelector('canvas');
         this.ctx = this.canvas.getContext('2d');
 
 
@@ -927,13 +927,41 @@ implementation.orientation_convert = el => new OrientationConvert(el);
 
 // Hook into the sections of the page, only firing implementations when visible
 
-const sections = Array.from(document.querySelectorAll('[data-key]'))
-    .map( e => ({
-        element: e,
-        key: e.dataset.key,
-        fn: implementation[e.dataset.key] && implementation[e.dataset.key](e)
-    }));
+let sections = []
 
+// sections in view
+let active = []
+// whether the active list needs updating
+let _needs_update
+
+
+const assignSections = () => {
+  sections = Array.from(document.querySelectorAll('[data-key]'))
+      .map( e => ({
+          element: e,
+          key: e.dataset.key,
+          fn: implementation[e.dataset.key] && implementation[e.dataset.key](e)
+      }));
+  _needs_update = true
+
+}
+
+if(window.Prism) {
+
+  // same as Prism.highlightAll, but with a single callback at end
+  const elements = document.querySelectorAll('code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code');
+
+  let count = elements.length
+
+  for (let i=0, element; element = elements[i++];) {
+    Prism.highlightElement(element, false, () => {
+      if(!--count) assignSections()
+    });
+  }
+
+} else {
+  assignSections()
+}
 
 // debug
 // ((failed) => {
@@ -944,10 +972,6 @@ const sections = Array.from(document.querySelectorAll('[data-key]'))
 
 
 
-let active = [];
-
-// whether the active list needs updating
-let _needs_update = true
 
 function updateActive(){
     if(!_needs_update) return;

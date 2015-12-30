@@ -186,7 +186,7 @@
 
 <p>We need to store the cursor position, so lets write some javascript:</p>
 
-<pre><code>class Point {
+<pre><code class="language-javascript">class Point {
   constructor (x, y, prev) {
 
     this.x = x
@@ -235,7 +235,7 @@ move(
 <p>When we do want to store the data, we can hold a reference to a point, and when any subsequent points added, they're accessible by traversing the <code>.next</code> property.</p>
 
 
-<pre><code>function* points(p) {
+<pre><code class="language-javascript">function* points(p) {
   do yield p
   while (p = p.next)
 }
@@ -257,7 +257,9 @@ const traverse = (timestamp) => {
 requestAnimationFrame(traverse)
 
 /**
-* start &rarr; current:<div data-key="move_list"><canvas height="200" width="500"></canvas></div>*/
+* start &rarr; current:
+<canvas data-key="move_list" height="200" width="500"></canvas>
+*/
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
 
@@ -272,7 +274,7 @@ requestAnimationFrame(traverse)
 
 <p>Now that we’ve got access to the last 1.5 seconds of points, we can calculate how far the pointer has moved. We’ll define this as the diagonal length of the bounding box of points - that way it’s a bit more robust to wobbly/shaky input.</p>
 
-<pre><code data-key="move_calculation">const range = (points) => {
+<pre><code class="language-javascript" data-key="move_calculation">const range = (points) => {
 
   let x_min, x_max, y_min, y_max, first = true;
 
@@ -329,7 +331,7 @@ const distance (e) =>
 
 <p>We can now implement our "too far" rule, first scaling and limiting the distance so that it's a bit handier to play with.</p>
 
-<pre><code>
+<pre><code class="language-javascript">
 const scale = (d) => d / 300
 const limit = Math.min.bind(null, 1)
 
@@ -355,7 +357,7 @@ const tooFar = (s) => s >= 1
 <p>One way to deal with this is to use HSL colours, varying the hue from green (120) to red (0) and keeping the brightness and saturation constant. This also means the colour will sweep through yellow and orange (which are also pretty christmassy).</p>
 
 
-<pre><code data-key="colour_calculation">// map [0,1] to [120,0]
+<pre><code class="language-javascript" data-key="colour_calculation">// map [0,1] to [120,0]
 const hue = d => (1-d) * 120
 
 // use string interpolation to
@@ -381,7 +383,7 @@ const colour =
 <p>We can listen for <code>deviceorientation</code> events in our browser.  This tells us which way the device is pointing through the event <code>gamma</code>, <code>alpha</code> &amp; <code>beta</code> properties.</p>
 
 
-<pre><code data-key="orientation_current">{
+<pre><code class="language-javascript" data-key="orientation_current">{
   gamma:     _,
   alpha:     _,
   beta:      _,
@@ -395,7 +397,7 @@ const colour =
 <p>We can use these properties to tell how far the device has rotated with the same functions we had before (with a little bit of updating to support a third property).</p>
 
 
-<pre><code>/*
+<pre><code class="language-javascript">/*
 * orientation points:
 <canvas height="200" width="300" data-key="orientation_graph"></canvas>
 *
@@ -412,7 +414,7 @@ const colour =
 <p>We can get around this by mapping our values to <code>0&rarr;2&Pi;</code>, then calling <code>Math.Sin</code> on it.  This means that <code>0</code> &amp; <code>360</code> will both become <code>1</code>, and <code>180</code> will become <code>-1</code>, and transitions between will be smooth.  It's not a terribly great approach for a few reasons - but it'll do the job for now.</p>
 
 
-<pre><code>const PI2 = 2 * Math.PI
+<pre><code class="language-javascript">const PI2 = 2 * Math.PI
 
 const convert = p => ({
     alpha: Math.sin(PI2 * (p.alpha / 360)),
@@ -436,18 +438,18 @@ const convert = p => ({
 
 <p>It's not quite a game yet, for that we need to give players a way to start playing, and to lose.  We can think of this as a series of states:</p>
 
-<pre><code>[ready, started, lost]</code></pre>
+<pre><code class="language-javascript">[ready, started, lost]</code></pre>
 
 <p>And some transitions between the states:</p>
 
-<pre><code>[start, lose]</code></pre>
+<pre><code class="language-javascript">[start, lose]</code></pre>
 
 <p><em>There's a depressing absence of `<code>won/win</code>` here. That's because our devices aren’t connected together, so we can’t really tell if there is anyone else left. I'll be talking about this bit at <a href="https://www.frontierconf.com/">Frontier Conf</a> in March - you should come along.</em></p>
 
 <p>Now we've got the model, we can implment out game with something like:</p>
 
 
-<pre><code>const READY = 1,
+<pre><code class="language-javascript">const READY = 1,
       STARTED = 2,
       LOST = 4
 
@@ -507,6 +509,7 @@ function lose () {
 
 
 
+<script src="assets/prism.js" data-manual></script>
 <script src="es5/polyfill.js"></script>
 <script src="es5/story.js"></script>
 
