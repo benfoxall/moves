@@ -5,8 +5,7 @@
   "scripts": {
     "test": "karma start test/karma.ci.conf",
     "build": "babel -d es5 src",
-    "watch": "babel -d es5 src -w",
-    "server": "live-server --ignore=src,node_modules",
+    "start": "babel -d es5 src -w & live-server --ignore=src,node_modules",
     "polyfill": "cp node_modules/babel-polyfill/dist/polyfill.js es5/polyfill.js"
   },
   "repository": {
