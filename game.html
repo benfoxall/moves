@@ -6,44 +6,99 @@
     <link rel="manifest" href="game.manifest.json">
     <title>JoustJS</title>
     <style>
+
+      html, body {
+        height: 100%
+      }
+
       body {
-        margin: 0; text-align: center;
+        transform-style: preserve-3d;
+        -webkit-perspective-origin: 50% 0;
+        perspective: 300px;
+        overflow: hidden;
+        font-family: sans-serif;
+        margin: 0;
+        text-align: center;
         background: #ccc;
-        will-change: background;
-        /*transition: background .2s;*/
-        transform: translateZ(50%);
       }
-      button {
-        position: absolute;
-        top:50%;
-        left:50%;
-        transform: translate(-50%, -50%);
 
-        font-size: 5em;
-        font-size: 35vmin;
-        border: none;
-        background: #fff;
-        height: 80vmin;
-        width: 80vmin;
-        border-radius: 50%;
-
-        transition: all .8s;
-        transform-origin: 50% 50% ;
-        box-shadow: rgba(0,0,0,0.4) -.1em .2em .4em;
-      }
 
       button.hidden {
-        /*box-shadow: rgba(0,0,0,0.1) 0 0 0;*/
-        transform: translate(-50%, -50%) rotate(20deg) scale(0.8) ;
-        opacity: 0;
+        transform: rotateX(-95deg);
         outline: none;
       }
+
+      button {
+        position: absolute;
+        width: 100%;
+        top: 0;
+        left: 0;
+        transition: transform .75s;
+        will-change: transform;
+        transform-origin: 50% 0;
+        border: none;
+        background: #fff;
+        background: rgba(255,255,255,.9);
+
+        padding: .5em;
+
+        font-size: 3em;
+        font-size: 6vw;
+        box-shadow: rgba(1,1,1,0.5) 0 0 15px
+      }
+
+      /* initial button animation */
+      button {
+        animation-duration: .5s;
+        animation-name: show;
+        animation-iteration-count: 1;
+      }
+
+      @-webkit-keyframes show {
+        from  { transform: rotateX(-95deg); }
+        to   { transform: rotateX(0deg); }
+      }
+
+
+      #centre {
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+
+      #warning {
+
+        margin: 0;
+        padding: 2em 0;
+        font-size: 4vh;
+
+        animation-duration: 4s;
+        animation-name: fadein;
+        animation-iteration-count: 1;
+        /*animation-direction: alternate;*/
+      }
+
+      /* todo - autoprefix */
+      @-webkit-keyframes fadein {
+        from  { opacity: 0 }
+        70%   { opacity: 0 }
+        to    { opacity: 1 }
+      }
+
     </style>
   </head>
   <body>
-    <button>GO</button>
+
+    <div id="centre">
+      <p id="warning">
+        no device orientation events captured
+      </p>
+    </div>
 
     <script src="es5/polyfill.js"></script>
     <script src="es5/game.js"></script>
+
   </body>
 </html>

@@ -79,8 +79,8 @@ const colour = h => `hsl(${~~hue(h)}, 100%, 45%)`
 const READY = 1, STARTED = 2, LOST = 4
 let state = READY
 
-const button = document.getElementsByTagName('button')[0]
-
+const button = document.createElement('button')
+button.textContent = 'play'
 
 const _start = () => {
   if(state & READY | LOST) {
@@ -179,3 +179,24 @@ const handle = e => {
 
 button.addEventListener('click', handle, false)
 button.addEventListener('touchstart', handle, false)
+
+
+
+// initial setup, check for events before displaying button
+if(!('DeviceOrientationEvent' in window))
+  warning.textContent = 'device orientation not supported'
+
+else
+  new Promise(done => {
+    const check = (e) => {
+      if(e.gamma) {
+        window.removeEventListener('deviceorientation', check)
+        done(e)
+      }
+    }
+    window.addEventListener('deviceorientation', check)
+  })
+  .then(() => {
+    warning.parentNode.removeChild(warning)
+    document.body.appendChild(button)
+  })

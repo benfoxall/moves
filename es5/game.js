@@ -136,7 +136,8 @@ var READY = 1,
     LOST = 4;
 var state = READY;
 
-var button = document.getElementsByTagName('button')[0];
+var button = document.createElement('button');
+button.textContent = 'play';
 
 var _start = function _start() {
   if (state & READY | LOST) {
@@ -232,3 +233,17 @@ var handle = function handle(e) {
 
 button.addEventListener('click', handle, false);
 button.addEventListener('touchstart', handle, false);
+
+// initial setup, check for events before displaying button
+if (!('DeviceOrientationEvent' in window)) warning.textContent = 'device orientation not supported';else new Promise(function (done) {
+  var check = function check(e) {
+    if (e.gamma) {
+      window.removeEventListener('deviceorientation', check);
+      done(e);
+    }
+  };
+  window.addEventListener('deviceorientation', check);
+}).then(function () {
+  warning.parentNode.removeChild(warning);
+  document.body.appendChild(button);
+});
