@@ -137,7 +137,7 @@ var READY = 1,
 var state = READY;
 
 var button = document.createElement('button');
-button.textContent = 'play';
+button.textContent = '▶︎';
 
 var _start = function _start() {
   if (state & READY | LOST) {

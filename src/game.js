@@ -80,7 +80,7 @@ const READY = 1, STARTED = 2, LOST = 4
 let state = READY
 
 const button = document.createElement('button')
-button.textContent = 'play'
+button.textContent = '▶︎'
 
 const _start = () => {
   if(state & READY | LOST) {
