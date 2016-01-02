@@ -417,9 +417,9 @@ const colour =
 <pre><code class="language-javascript">const PI2 = 2 * Math.PI
 
 const convert = p => ({
-    alpha: Math.sin(PI2 * (p.alpha / 360)),
+    alpha: Math.sin(PI2 * (p.alpha / 180)),
     beta:  Math.sin(PI2 * (p.beta  / 360)),
-    gamma: Math.sin(PI2 * (p.gamma / 180))
+    gamma: Math.sin(PI2 * (p.gamma / 360))
 })
 
 /*

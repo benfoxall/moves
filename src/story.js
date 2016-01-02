@@ -218,15 +218,15 @@ move3(
 
 
 // const convert = p => ({
-//     alpha: Math.sin(Math.PI*(p.alpha/360)),
+//     alpha: Math.sin(Math.PI*(p.alpha/180)),
 //     beta:  Math.sin(Math.PI*(p.beta /360)),
-//     gamma: Math.sin(Math.PI*(p.gamma/180))
+//     gamma: Math.sin(Math.PI*(p.gamma/360))
 // })
 
 const convert = p => ({
-    x: Math.sin(2*Math.PI*(p.x/360)),
+    x: Math.sin(2*Math.PI*(p.x /180)),
     y: Math.sin(2*Math.PI*(p.y /360)),
-    z: Math.sin(2*Math.PI*(p.z/180))
+    z: Math.sin(2*Math.PI*(p.z /360))
 })
 
 
