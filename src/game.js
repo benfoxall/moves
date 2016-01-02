@@ -66,8 +66,8 @@ const distance = (e) =>
     Math.pow(e.beta, 2)
   )
 
-// scale by .5 and limit to <1
-const scale = (d) => Math.min(1, d/2)
+// scale by 70% and limit to <1
+const scale = (d) => Math.min(1, d * .7)
 
 const tooFast = (s) => s >= 1
 

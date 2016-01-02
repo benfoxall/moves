@@ -114,9 +114,9 @@ var distance = function distance(e) {
   return Math.sqrt(Math.pow(e.gamma, 2) + Math.pow(e.alpha, 2) + Math.pow(e.beta, 2));
 };
 
-// scale by .5 and limit to <1
+// scale by 70% and limit to <1
 var scale = function scale(d) {
-  return Math.min(1, d / 2);
+  return Math.min(1, d * .7);
 };
 
 var tooFast = function tooFast(s) {
