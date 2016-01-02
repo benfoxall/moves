@@ -4,6 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="game.manifest.json">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
     <title>JoustJS</title>
     <style>
 
@@ -22,9 +26,12 @@
         background: #ccc;
       }
 
+      canvas {
+        max-width: 100%
+      }
 
       button.hidden {
-        transform: rotateX(-95deg);
+        transform: rotateX(-135deg);
         outline: none;
       }
 
@@ -38,11 +45,11 @@
         transform-origin: 50% 0;
         border: none;
         background: #fff;
-        background: rgba(255,255,255,.4);
+        background: rgba(255,255,255,.2);
         padding: .5em;
         font-size: 3em;
-        font-size: 6vw;
-        box-shadow: rgba(1,1,1,0.5) 0 0 1em;
+        font-size: 12vw;
+        /*box-shadow: rgba(1,1,1,0.5) 0 0 1em;*/
         min-height: 20vh;
       }
 

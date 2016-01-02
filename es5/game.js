@@ -150,6 +150,10 @@ var _lose = function _lose() {
   if (state & STARTED) {
     state = LOST;
     button.className = '';
+
+    // vibrate and play a noise
+    if (navigator.vibrate) navigator.vibrate(800);
+    boom();
   }
 };
 
@@ -210,17 +214,20 @@ var render = function render(timestamp) {
   _first = first;
   _current = current;
 
-  var d = scale(distance(extent(range(points(first)))));
+  _distance = scale(distance(extent(range(points(first)))));
 
-  document.body.style.background = colour(d);
+  document.body.style.background = colour(_distance);
 
-  if (tooFast(d)) _lose();
+  if (tooFast(_distance)) _lose();
 };
 
 var loop = function loop(timestamp) {
   requestAnimationFrame(loop);
   traverse(timestamp);
   render(timestamp);
+
+  // we didn't really discuss this one
+  visualise(timestamp);
 };
 
 requestAnimationFrame(loop);
@@ -234,6 +241,80 @@ var handle = function handle(e) {
 button.addEventListener('click', handle, false);
 button.addEventListener('touchstart', handle, false);
 
+/*
+  Stuff I didn't have time to cover…
+
+  1. drawing a line - only gamma/beta for now, thickness
+     based on distance covered
+
+  2. playing a sound with the web audio api
+     (audio generated with as3sfxr)
+
+*/
+
+var size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+
+var canvas = document.createElement('canvas');
+canvas.width = canvas.height = size;
+var ctx = canvas.getContext('2d');
+ctx.translate(size / 2, size / 2);
+ctx.lineWidth = 10;
+ctx.lineJoin = ctx.lineCap = 'round';
+ctx.strokeStyle = '#fff';
+
+var x = function x(p) {
+  return p.gamma * size / 2.3;
+};
+var y = function y(p) {
+  return p.beta * size / 2.3;
+};
+
+var _vfirst = undefined,
+    _vcurrent = undefined;
+var visualise = function visualise(timestamp) {
+
+  if (_vfirst == first && _vcurrent == current) return;
+  _vfirst = first;
+  _vcurrent = current;
+
+  ctx.clearRect(-size / 2, -size / 2, size, size);
+  ctx.save();
+
+  // works out weird
+  // ctx.rotate(-current.alpha)
+
+  ctx.lineWidth = _distance * 11;
+
+  ctx.beginPath();
+  var _iteratorNormalCompletion3 = true;
+  var _didIteratorError3 = false;
+  var _iteratorError3 = undefined;
+
+  try {
+    for (var _iterator3 = points(first)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+      var p = _step3.value;
+
+      ctx.lineTo(x(p), y(p));
+    }
+  } catch (err) {
+    _didIteratorError3 = true;
+    _iteratorError3 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion3 && _iterator3.return) {
+        _iterator3.return();
+      }
+    } finally {
+      if (_didIteratorError3) {
+        throw _iteratorError3;
+      }
+    }
+  }
+
+  ctx.stroke();
+  ctx.restore();
+};
+
 // initial setup, check for events before displaying button
 if (!('DeviceOrientationEvent' in window)) warning.textContent = 'device orientation not supported';else new Promise(function (done) {
   var check = function check(e) {
@@ -244,6 +325,38 @@ if (!('DeviceOrientationEvent' in window)) warning.textContent = 'device orienta
   };
   window.addEventListener('deviceorientation', check);
 }).then(function () {
-  warning.parentNode.removeChild(warning);
+  var centre = warning.parentNode;
+  centre.removeChild(warning);
+  centre.appendChild(canvas);
+
   document.body.appendChild(button);
 });
+
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var context = new AudioContext();
+
+var player = function player(url) {
+  var buffer = null;
+
+  var request = new XMLHttpRequest();
+  request.open('GET', url, true);
+  request.responseType = 'arraybuffer';
+
+  request.onload = function () {
+    context.decodeAudioData(request.response, function (_buffer) {
+      return buffer = _buffer;
+    }, console.log.bind(console, 'failed to load ' + url));
+  };
+  request.send();
+
+  return function () {
+    if (buffer) {
+      var source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(context.destination);
+      source.start(0);
+    }
+  };
+};
+
+var boom = player('assets/boom.wav');
