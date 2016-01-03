@@ -20,9 +20,15 @@ var move = function move(fn) {
   }, false);
 
   document.addEventListener('touchmove', function (e) {
-    for (var i = 0; i < e.touches.length; i++) {
-      fn.call(null, e.touches[i].pageX - window.scrollX, e.touches[i].pageY - window.scrollY);
+    var l = e.touches.length;
+    var x = 0,
+        y = 0;
+    for (var i = 0; i < l; i++) {
+      x += e.touches[i].pageX - window.scrollX;
+      y += e.touches[i].pageY - window.scrollY;
     }
+
+    fn.call(null, ~ ~(x / l), ~ ~(y / l));
   });
 };
 
@@ -301,7 +307,7 @@ var lose = function lose() {
   if (state & STARTED) {
     state = LOST;
     button.style.opacity = 1;
-    button.textContent = 'LOST! (START AGAIN)';
+    button.textContent = 'LOST!';
   }
 };
 
@@ -859,7 +865,7 @@ var OrientationCurrent = (function () {
     key: 'render',
     value: function render(timestamp) {
       if (currentO && this.last !== currentO) {
-        this.element.textContent = '{\n  gamma:     ' + currentO.x + ',\n  alpha:     ' + currentO.y + ',\n  beta:      ' + currentO.z + ',\n  timestamp: ' + ~ ~currentO.timestamp + '\n}';
+        this.element.textContent = '{\n  gamma:     ' + currentO.x + ',\n  alpha:     ' + currentO.y + ',\n  beta:      ' + currentO.z + '\n}';
         this.last = current;
       }
     }
@@ -1120,7 +1126,7 @@ var StateGame = (function (_Wakeable6) {
     key: 'render',
     value: function render(timestamp) {
       _get(Object.getPrototypeOf(StateGame.prototype), 'render', this).call(this);
-      if (state & LOST) return this.past = this.last = this.first = null;
+      // if(state & LOST) return this.past = this.last = this.first = null;
 
       // The actual stuff
       if (!currentO) return;

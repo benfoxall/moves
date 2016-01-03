@@ -184,7 +184,7 @@
 
 <p>The rule we’re going to implement is: <strong>the cursor must cover no further than 300 pixels in 1.5 seconds.</strong></p>
 
-<p>We need to store the cursor position, so lets write some javascript:</p>
+<p>First, we need to store the cursor position, so lets write some javascript:</p>
 
 <pre><code class="language-javascript">class Point {
   constructor (x, y, prev) {
@@ -202,13 +202,17 @@
 // store the most recent point
 let current = null
 
-// listen for pointer move events
-// (`move` is a helper function)
-move(
-  (x, y) => {
-    current = new Point(x, y, current)
-  }
-)
+// listen for mouse events
+// ('touchmove' handler is omitted)
+document.addEventListener('mousemove',
+  (e) => {
+    current = new Point(
+      e.pageX,
+      e.pageY,
+      current
+    )
+  },
+false);
 
 /*
 * current:
@@ -225,14 +229,12 @@ move(
 
 <p>This javascript looks kind of weird&hellip; That’s because we’re using <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Classes">class</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let">let</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">arrow function</a> syntax from es2015.  At some point in the future (probably not 2015) it'll be totally cool to use this in browsers, but for now it’s safest to transform it into es5 using a tool such as <a href="https://babeljs.io/">Babel</a>. <!-- To see an example of this kind of workflow (and the compiled es5 files) check out {{{LINK TO REPO}}}.--></p>
 
-<p>As well as storing the pointer coordinates, we're storing the time that it was stored using <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now">performance.now()</a></code>, which allows us to check if the point happened in a particular timespan.</p>
+<p>As well as storing the pointer coordinates, we're storing the time that it was observed using <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now">performance.now</a></code>, allowing us to check if the point happened in a particular timespan.</p>
 
 
-<p>We're storing the point as <code>current</code>, though we're also passing the previous point to it as an argument</p>
+<p>We're also passing our last <code>current</code> point as an argument when we create the new one.  If you look at the constructor of <code>Point</code>, you can see that we're linking the last point <strong>toward the new one</strong>, which means that we’ve got <strong>no way of accessing previous points</strong> (the <code>.next</code> property of <code>current</code> will be <code>undefined</code>). This is pretty cool, because the browser can garbage collect our past points.</p>
 
-<p>If you look at the constructor of <code>Point</code>, you can see that we're linking the last point <strong>toward the new one</strong>, which means that we’ve got <strong>no way of accessing previous points</strong> (the <code>.next</code> property of <code>current</code> will be <code>undefined</code>). This is pretty cool, because the browser can detect that, and garbage collect old data.</p>
-
-<p>When we do want to store the data, we can hold a reference to a point, and when any subsequent points added, they're accessible by traversing the <code>.next</code> property.</p>
+<p>When we do want to store the data, we can hold a reference to a point, and when any subsequent points added they're accessible by traversing the <code>.next</code> property.</p>
 
 
 <pre><code class="language-javascript">function* points(p) {
@@ -269,7 +271,7 @@ requestAnimationFrame(traverse)
 <ul>
   <li>We've made a generator function (<code>points</code>), which will let us iterate through our stored points in a <code>for&hellip;of</code> loop.</li>
   <li>We’re calling the <code>traverse</code> function with <code>requestAnimationFrame</code>, this calls it in time with the browser refresh rate (and pauses when the page is minimized/hidden).
-  <li><code>requestAnimationFrame</code> also passes a <code>timestamp</code> value, which kind of the equivelant of calling <code>performance.now()</code>; allowing us to compare to the timestamps generated in Point.</li>
+  <li><code>requestAnimationFrame</code> also passes a <code>timestamp</code> value, which kind of the equivelant of calling <code>performance.now</code>; allowing us to compare to the timestamps generated in Point.</li>
 </ul>
 
 <p>Now that we’ve got access to the last 1.5 seconds of points, we can calculate how far the pointer has moved. We’ll define this as the diagonal length of the bounding box of points - that way it’s a bit more robust to wobbly/shaky input.</p>
@@ -360,10 +362,9 @@ const tooFar = (s) => s >= 1
 <pre><code class="language-javascript" data-key="colour_calculation">// map [0,1] to [120,0]
 const hue = d => (1-d) * 120
 
-// use string interpolation to
-// return our colour
+// generate a css colour
 const colour =
-  d => `hsl(${~~hue(d)}, 100%, 45%)`
+  d => `hsl(${Math.floor(hue(d))}, 100%, 45%)`
 
 /*
 * <span id="colour_calculation_colour">_</span>
@@ -378,7 +379,7 @@ const colour =
 
 <h2>Movement</h2>
 
-<p>Right, we've got all that stuff now - lets use it to track the movement of our device.</p>
+<p>Right, we've got that all sorted; let's start using the actual movement of our device instead of a pointer position.</p>
 
 <p>We can listen for <code>deviceorientation</code> events in our browser.  This tells us which way the device is pointing through the event <code>gamma</code>, <code>alpha</code> &amp; <code>beta</code> properties.</p>
 
@@ -386,22 +387,18 @@ const colour =
 <pre><code class="language-javascript" data-key="orientation_current">{
   gamma:     _,
   alpha:     _,
-  beta:      _,
-  timestamp: _
+  beta:      _
 }</code></pre>
 
 <div class="help-circle move"><button data-help="move"></button></div>
-
 <p class="help-move-hint"><em>To emulate some device orientation events, drag the red circle above</em></p>
 
 <p>We can use these properties to tell how far the device has rotated with the same functions we had before (with a little bit of updating to support a third property).</p>
 
 
 <pre><code class="language-javascript">/*
-* orientation points:
+* orientations (gamma &amp; alpha):
 <canvas height="200" width="300" data-key="orientation_graph"></canvas>
-*
-* distance: …
 */
 </code></pre>
 
@@ -444,10 +441,9 @@ const convert = p => ({
 
 <pre><code class="language-javascript">[start, lose]</code></pre>
 
-<p><em>There's a depressing absence of `<code>won/win</code>` here. That's because our devices aren’t connected together, so we can’t really tell if there is anyone else left. I'll be talking about this bit at <a href="https://www.frontierconf.com/">Frontier Conf</a> in March - you should come along.</em></p>
+<p><em>There's a sad absence of a <code>won</code> state here. Because our devices aren’t connected together, we can’t really tell if there is one person left. I'll be talking about this bit at <a href="https://www.frontierconf.com/">Frontier Conf</a> in March - you should come along.</em></p>
 
 <p>Now we've got the model, we can implment out game with something like:</p>
-
 
 <pre><code class="language-javascript">const READY = 1,
       STARTED = 2,
@@ -480,33 +476,24 @@ function lose () {
 <div class="help-circle move"><button data-help="move"></button></div>
 
 
-<p>Done!</p>
+<p>Whoop!</p>
 
 
 <h2>The rest of the owl</h2>
 
-<p>{{todo}}</p>
-
-<p>Now we can add some more stuff:</p>
+<p>Now that we've got a basic game, we can make it cooler by adding:</p>
 
 <ul>
-<li>some html - because it’s a webpage</li>
-<li>a manifest file - so we can launch in fullscreen and lock the orientation</li>
-<li>a cool little script by Max to change the heading colour to make the url bar awesome</li>
-<li>Vibrate and Audio feedback so you know when you’ve lost</li>
-<li>a service worker - to allow this to all happen offline.</li>
-<li>a big button to take you to it</li>
+  <li><strong>Some HTML &amp; CSS</strong> - to make it look pretty</li>
+  <li><strong>A <a href="https://w3c.github.io/manifest/">Web App Manifest</a></strong> - so we can control how it looks when opened from a phone home screen</li>
+  <li><strong>Better feedback to the player</strong> - so they know when they've lost</li>
 </ul>
 
-
-
-<h3>Other things</h3>
-
-<ul>
-  <li>To see some other colour interpolation methods - http://davidjohnstone.net/pages/lch-lab-colour-gradient-picker</li>
-  <li>more about device movement</li>
-</ul>
-
+<p>
+  <a href="#">Play our example game here</a>
+  <br />
+  <small>(source code <a href="#">on github</a>)</small>
+</p>
 
 
 <script src="assets/prism.js" data-manual></script>

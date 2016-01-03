@@ -8,11 +8,14 @@ const move = fn => {
     }, false);
 
     document.addEventListener('touchmove', function(e){
-      for (var i = 0; i < e.touches.length; i++) {
-         fn.call(null,
-             e.touches[i].pageX - window.scrollX,
-             e.touches[i].pageY - window.scrollY)
+      const l = e.touches.length
+      let x = 0, y = 0
+      for (let i = 0; i < l; i++) {
+        x += e.touches[i].pageX - window.scrollX
+        y += e.touches[i].pageY - window.scrollY
       }
+
+      fn.call(null, ~~(x / l), ~~(y / l))
     });
 }
 
@@ -246,7 +249,7 @@ const lose = () => {
   if(state & STARTED) {
     state = LOST;
     button.style.opacity = 1
-    button.textContent = 'LOST! (START AGAIN)'
+    button.textContent = 'LOST!'
   }
 }
 
@@ -660,8 +663,7 @@ class OrientationCurrent {
             this.element.textContent = `{
   gamma:     ${currentO.x},
   alpha:     ${currentO.y},
-  beta:      ${currentO.z},
-  timestamp: ${~~currentO.timestamp}
+  beta:      ${currentO.z}
 }`
             this.last = current
         }
@@ -823,7 +825,7 @@ class StateGame extends Wakeable {
 
     render(timestamp) {
       super.render()
-      if(state & LOST) return this.past = this.last = this.first = null;
+      // if(state & LOST) return this.past = this.last = this.first = null;
 
 
 
