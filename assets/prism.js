@@ -419,9 +419,10 @@ script = script[script.length - 1];
 if (script) {
 	_.filename = script.src;
 
-	if (document.addEventListener && !script.hasAttribute('data-manual')) {
-		document.addEventListener('DOMContentLoaded', _.highlightAll);
-	}
+	// always manual
+	// if (document.addEventListener && !script.hasAttribute('data-manual')) {
+	// 	document.addEventListener('DOMContentLoaded', _.highlightAll);
+	// }
 }
 
 return _self.Prism;
