@@ -87,7 +87,7 @@ false);
 * }</span>
 */
 </code></pre>
-<div class="help-circle touch"><button data-help="touch"></button></div>
+<div class="help-circle touch"><button class="is-touch"></button></div>
 
 <p class="help-touch-hint"><em>If you're on a touch device, drag from the circle above to prevent scrolling (it'll help you see what’s going on)</em></p>
 
@@ -127,7 +127,7 @@ requestAnimationFrame(traverse)
 <div id="replace_move_list"></div>
 */
 </code></pre>
-<div class="help-circle touch"><button data-help="touch"></button></div>
+<div class="help-circle touch"><button class="is-touch"></button></div>
 
 
 <p>Right. Some things:</p>
@@ -193,7 +193,7 @@ const distance (e) =&gt;
 */
 
 </code></pre>
-<div class="help-circle touch"><button data-help="touch"></button></div>
+<div class="help-circle touch"><button class="is-touch"></button></div>
 
 <p>We can now implement our "too far" rule, first scaling and limiting the distance so that it's a bit handier to play with.</p>
 
@@ -208,7 +208,7 @@ const tooFar = (s) =&gt; s &gt;= 1
 * tooFar: _</span>
 * <span id="move_graph_bar"></span>*/
 </code></pre>
-<div class="help-circle touch"><button data-help="touch"></button></div>
+<div class="help-circle touch"><button class="is-touch"></button></div>
 
 <p>Great.</p>
 
@@ -235,7 +235,7 @@ const colour =
 *
 <div id="colour_calculation_out" style="width:100%; height:150px;"> </div>
 */</code></pre>
-<div class="help-circle touch"><button data-help="touch"></button></div>
+<div class="help-circle touch"><button class="is-touch"></button></div>
 
 
 <p>Cool.</p>
@@ -254,7 +254,7 @@ const colour =
   beta:      _
 }</code></pre>
 
-<div class="help-circle move"><button data-help="move"></button></div>
+<div class="help-circle move"><button class="is-move"></button></div>
 <p class="help-move-hint"><em>To emulate some device orientation events, drag the red circle above</em></p>
 
 <p>We can use these properties to tell how far the device has rotated with the same functions we had before (with a little bit of updating to support a third property).</p>
@@ -266,7 +266,7 @@ const colour =
 */
 </code></pre>
 
-<div class="help-circle move"><button data-help="move"></button></div>
+<div class="help-circle move"><button class="is-move"></button></div>
 
 
 
@@ -291,7 +291,7 @@ const convert = p =&gt; ({
 */
 </code></pre>
 
-<div class="help-circle move"><button data-help="move"></button></div>
+<div class="help-circle move"><button class="is-move"></button></div>
 
 <p>Now our distance doesn't jump around.  Though it's a lot smaller than before (from <code>-1</code> to <code>1</code>), so we can update our `scale` function to reflect that.</p>
 
@@ -337,7 +337,7 @@ function lose () {
 </div>
 
 <p></p>
-<div class="help-circle move"><button data-help="move"></button></div>
+<div class="help-circle move"><button class="is-move"></button></div>
 
 <p>Hooray!</p>
 

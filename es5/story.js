@@ -1279,8 +1279,7 @@ if (window.Prism) {
 
     for (var i = 0, element; element = elements[i++];) {
       Prism.highlightElement(element, false, function () {
-        console.log(count);
-        if (! --count) setTimeout(assignSections, 100);
+        if (! --count) assignSections();
       });
     }
   })();
@@ -1374,7 +1373,7 @@ on(document, 'touchstart', enableTouchHelpCircles);
 on(document, 'touchstart', function (e) {
   var target = e.target;
 
-  if (target.dataset.help === 'touch') {
+  if (target.classList.contains('is-touch')) {
     (function () {
       e.preventDefault();
 
@@ -1401,7 +1400,7 @@ document.addEventListener('mousemove', (e) => {
 var moveHelp = function moveHelp(e) {
   var target = e.target;
 
-  if (target.dataset.help === 'move') {
+  if (target.classList.contains('is-move')) {
     (function () {
       e.preventDefault();
 
@@ -1445,7 +1444,7 @@ on(document, 'mousedown', moveHelp);
 var moveHelpT = function moveHelpT(e) {
   var target = e.target;
 
-  if (target.dataset.help === 'move') {
+  if (target.classList.contains('is-move')) {
     (function () {
       e.preventDefault();
 

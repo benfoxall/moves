@@ -973,8 +973,7 @@ if(window.Prism) {
 
   for (let i=0, element; element = elements[i++];) {
     Prism.highlightElement(element, false, () => {
-      console.log(count)
-      if(!--count) setTimeout(assignSections,100)
+      if(!--count) assignSections()
     });
   }
 
@@ -1076,11 +1075,10 @@ let enableTouchHelpCircles = () => {
 on(document, 'touchstart', enableTouchHelpCircles);
 
 
-
 on(document, 'touchstart', e => {
   let target = e.target;
 
-  if(target.dataset.help === 'touch'){
+  if(target.classList.contains('is-touch')){
     e.preventDefault();
 
     target.classList.add('helping');
@@ -1104,10 +1102,11 @@ document.addEventListener('mousemove', (e) => {
 */
 
 
+
 const moveHelp = e => {
   let target = e.target;
 
-  if(target.dataset.help === 'move'){
+  if(target.classList.contains('is-move')){
     e.preventDefault();
 
     let startX = e.pageX;
@@ -1154,7 +1153,7 @@ on(document, 'mousedown', moveHelp)
 const moveHelpT = e => {
   let target = e.target;
 
-  if(target.dataset.help === 'move'){
+  if(target.classList.contains('is-move')){
     e.preventDefault();
 
     let startX = e.touches[0].pageX;
