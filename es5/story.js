@@ -12,6 +12,19 @@ var _marked = [points, gmap].map(regeneratorRuntime.mark);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+// replace things that aren't allowed in wordpress
+
+var replacements = {
+  replace_move_list: '<canvas class="d-key" id="move_list" height="200" width="500"></canvas>',
+  replace_orientation_graph: '<canvas height="200" width="300" class="d-key" id="orientation_graph">'
+};
+
+Object.keys(replacements).forEach(function (k) {
+  var el = document.getElementById(k);
+  if (!el) return console.log("could not find", k);
+  el.outerHTML = replacements[k];
+});
+
 // Helpers
 
 var move = function move(fn) {
@@ -1243,12 +1256,14 @@ var active = [];
 // whether the active list needs updating
 var _needs_update = undefined;
 
+//<span class="d-key" id="move_current">{
+
 var assignSections = function assignSections() {
-  sections = Array.from(document.querySelectorAll('[data-key]')).map(function (e) {
+  sections = Array.from(document.getElementsByClassName('d-key')).map(function (e) {
     return {
       element: e,
-      key: e.dataset.key,
-      fn: implementation[e.dataset.key] && implementation[e.dataset.key](e)
+      key: e.id,
+      fn: implementation[e.id] && implementation[e.id](e)
     };
   });
   _needs_update = true;

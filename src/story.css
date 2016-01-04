@@ -87,14 +87,14 @@ ul {
 }
 
 
-#game {
+#state_game {
   /*height:200px;*/
   background: #ccc;
   text-align: center;
   padding:5%;
 }
 
-#game button {
+#state_game button {
   font-size: 2em;
   padding:1em;
   width:90%;

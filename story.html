@@ -80,7 +80,7 @@ false);
 
 /*
 * current:
-* <span data-key="move_current">{
+* <span class="d-key" id="move_current">{
 *  x:…,
 *  y:…,
 *  timestamp:…
@@ -124,7 +124,7 @@ requestAnimationFrame(traverse)
 
 /**
 * start &rarr; current:
-<canvas data-key="move_list" height="200" width="500"></canvas>
+<div id="replace_move_list"></div>
 */
 </code></pre>
 <div class="help-circle touch"><button data-help="touch"></button></div>
@@ -140,7 +140,7 @@ requestAnimationFrame(traverse)
 
 <p>Now that we’ve got access to the last 1.5 seconds of points, we can calculate how far the pointer has moved. We’ll define this as the diagonal length of the bounding box of points - that way it’s a bit more robust to wobbly/shaky input.</p>
 
-<pre><code class="language-javascript" data-key="move_calculation">const range = (points) => {
+<pre><code class="language-javascript d-key" id="move_calculation">const range = (points) => {
 
   let x_min, x_max, y_min, y_max, first = true;
 
@@ -203,7 +203,7 @@ const limit = Math.min.bind(null, 1)
 
 const tooFar = (s) =&gt; s &gt;= 1
 
-/*<span data-key="move_graph"><span id="move_graph_text">
+/*<span class="d-key" id="move_graph"><span id="move_graph_text">
 * scaled: _
 * tooFar: _</span>
 * <span id="move_graph_bar"></span>*/
@@ -223,7 +223,7 @@ const tooFar = (s) =&gt; s &gt;= 1
 <p>One way to deal with this is to use HSL colours, varying the hue from green (120) to red (0) and keeping the brightness and saturation constant. This also means the colour will sweep through yellow and orange (which are also pretty christmassy).</p>
 
 
-<pre><code class="language-javascript" data-key="colour_calculation">// map [0,1] to [120,0]
+<pre><code class="language-javascript d-key" id="colour_calculation">// map [0,1] to [120,0]
 const hue = d =&gt; (1-d) * 120
 
 // generate a css colour
@@ -248,7 +248,7 @@ const colour =
 <p>We can listen for <code>deviceorientation</code> events in our browser.  This tells us which way the device is pointing through the event <code>gamma</code>, <code>alpha</code> &amp; <code>beta</code> properties.</p>
 
 
-<pre><code class="language-javascript" data-key="orientation_current">{
+<pre><code class="language-javascript d-key" id="orientation_current">{
   gamma:     _,
   alpha:     _,
   beta:      _
@@ -262,7 +262,7 @@ const colour =
 
 <pre><code class="language-javascript">/*
 * orientations (gamma &amp; alpha):
-<canvas height="200" width="300" data-key="orientation_graph"></canvas>
+<div id="replace_orientation_graph"></div>
 */
 </code></pre>
 
@@ -284,7 +284,7 @@ const convert = p =&gt; ({
 })
 
 /*
-* converted: <span data-key="orientation_convert">
+* converted: <span class="d-key" id="orientation_convert">
 *   gamma = _
 *   alpha = _
 *   beta  = _</span>
@@ -329,10 +329,10 @@ function lose () {
   }
 }
 
-// state = <span data-key="state_code">READY</span>
+// state = <span class="d-key" id="state_code">READY</span>
 </code></pre>
 
-<div data-key="state_game" id="game">
+<div class="d-key" id="state_game" id="game">
   <button id="state_game_button">START</button>
 </div>
 
@@ -356,11 +356,11 @@ function lose () {
 </p>
 
 
-<!-- <script src="assets/prism.js" data-manual></script>
+<script src="assets/prism.js" data-manual></script>
 <script src="es5/polyfill.js"></script>
-<script src="es5/story.js"></script> -->
+<script src="es5/story.js"></script>
 
-<script src="es5/bundle.js"></script>
+<!-- <script src="es5/bundle.js"></script> -->
 
 </body>
 </html>

@@ -1,3 +1,18 @@
+// replace things that aren't allowed in wordpress
+
+const replacements = {
+  replace_move_list: '<canvas class="d-key" id="move_list" height="200" width="500"></canvas>',
+  replace_orientation_graph: '<canvas height="200" width="300" class="d-key" id="orientation_graph">'
+}
+
+Object.keys(replacements).forEach((k) => {
+  const el = document.getElementById(k)
+  if(!el)
+    return console.log("could not find", k)
+  el.outerHTML = replacements[k]
+})
+
+
 // Helpers
 
 const move = fn => {
@@ -936,13 +951,14 @@ let active = []
 // whether the active list needs updating
 let _needs_update
 
+//<span class="d-key" id="move_current">{
 
 const assignSections = () => {
-  sections = Array.from(document.querySelectorAll('[data-key]'))
+  sections = Array.from(document.getElementsByClassName('d-key'))
       .map( e => ({
           element: e,
-          key: e.dataset.key,
-          fn: implementation[e.dataset.key] && implementation[e.dataset.key](e)
+          key: e.id,
+          fn: implementation[e.id] && implementation[e.id](e)
       }));
   _needs_update = true
 

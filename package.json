@@ -6,9 +6,9 @@
     "test": "karma start test/karma.ci.conf",
     "build": "babel -d es5 src",
     "start": "babel -d es5 src -w & live-server --ignore=src,node_modules",
-    "css": "postcss --use autoprefixer src/story.css -o assets/story.css",
+    "css": "postcss --use autoprefixer --use cssnano src/story.css -o assets/story.css",
     "polyfill": "cp node_modules/babel-polyfill/dist/polyfill.js es5/polyfill.js",
-    "bundle": "cat assets/prism.js es5/polyfill.js es5/story.js | ./node_modules/.bin/uglifyjs > es5/bundle.js"
+    "bundle": "cat assets/prism.js es5/polyfill.js es5/story.js | uglifyjs > es5/bundle.js"
   },
   "repository": {
     "type": "git",
