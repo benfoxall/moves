@@ -2,7 +2,11 @@
 
 const replacements = {
   replace_move_list: '<canvas class="d-key" id="move_list" height="200" width="500"></canvas>',
-  replace_orientation_graph: '<canvas height="200" width="300" class="d-key" id="orientation_graph">'
+  replace_orientation_graph: '<canvas height="200" width="300" class="d-key" id="orientation_graph">',
+  replace_warning: `<label class="code-warning">
+    <input type="checkbox" id="disable-jjs" />
+    disable interactive code examples
+</label>`
 }
 
 Object.keys(replacements).forEach((k) => {
@@ -12,6 +16,12 @@ Object.keys(replacements).forEach((k) => {
   el.outerHTML = replacements[k]
 })
 
+
+// (dev, replace in test)
+;[].forEach.call(
+  document.getElementsByClassName('x-javascript'),
+  (d) => {d.classList.add('language-javascript')}
+)
 
 // Helpers
 

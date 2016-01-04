@@ -16,13 +16,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var replacements = {
   replace_move_list: '<canvas class="d-key" id="move_list" height="200" width="500"></canvas>',
-  replace_orientation_graph: '<canvas height="200" width="300" class="d-key" id="orientation_graph">'
+  replace_orientation_graph: '<canvas height="200" width="300" class="d-key" id="orientation_graph">',
+  replace_warning: '<label class="code-warning">\n    <input type="checkbox" id="disable-jjs" />\n    disable interactive code examples\n</label>'
 };
 
 Object.keys(replacements).forEach(function (k) {
   var el = document.getElementById(k);
   if (!el) return console.log("could not find", k);
   el.outerHTML = replacements[k];
+})
+
+// (dev, replace in test)
+;[].forEach.call(document.getElementsByClassName('x-javascript'), function (d) {
+  d.classList.add('language-javascript');
 });
 
 // Helpers
