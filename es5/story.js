@@ -1279,7 +1279,8 @@ if (window.Prism) {
 
     for (var i = 0, element; element = elements[i++];) {
       Prism.highlightElement(element, false, function () {
-        if (! --count) assignSections();
+        console.log(count);
+        if (! --count) setTimeout(assignSections, 100);
       });
     }
   })();

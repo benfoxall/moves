@@ -973,7 +973,8 @@ if(window.Prism) {
 
   for (let i=0, element; element = elements[i++];) {
     Prism.highlightElement(element, false, () => {
-      if(!--count) assignSections()
+      console.log(count)
+      if(!--count) setTimeout(assignSections,100)
     });
   }
 
