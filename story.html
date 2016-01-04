@@ -69,7 +69,7 @@ let current = null
 // listen for mouse events
 // ('touchmove' handler is omitted)
 document.addEventListener('mousemove',
-  (e) => {
+  (e) =&gt; {
     current = new Point(
       e.pageX,
       e.pageY,
@@ -109,7 +109,7 @@ false);
 // our starting point
 let start = null
 
-const traverse = (timestamp) => {
+const traverse = (timestamp) =&gt; {
   requestAnimationFrame(traverse)
 
   if (!current) return
@@ -117,7 +117,7 @@ const traverse = (timestamp) => {
   // move forward until we are
   // within 1.5 seconds of now
   for(start of points(start || current))
-    if(past.timestamp > timestamp - 1500)
+    if(past.timestamp &gt; timestamp - 1500)
       break
 }
 requestAnimationFrame(traverse)
@@ -152,11 +152,11 @@ requestAnimationFrame(traverse)
           continue;
       }
 
-      if (n.x < x_min) {x_min = n.x}
-      else if (n.x > x_max ) {x_max = n.x}
+      if (n.x &lt; x_min) {x_min = n.x}
+      else if (n.x &gt; x_max ) {x_max = n.x}
 
-      if (n.y < y_min) {y_min = n.y}
-      else if (n.y > y_max) {y_max = n.y}
+      if (n.y &lt; y_min) {y_min = n.y}
+      else if (n.y &gt; y_max) {y_max = n.y}
   }
 
   return {
@@ -171,7 +171,7 @@ requestAnimationFrame(traverse)
 */
 
 
-const extent = (range) => ({
+const extent = (range) =&gt; ({
   x: range.x.max - range.x.min,
   y: range.y.max - range.y.min
 })
@@ -182,7 +182,7 @@ const extent = (range) => ({
 */
 
 
-const distance (e) =>
+const distance (e) =&gt;
   Math.sqrt(
     Math.pow(e.x, 2) +
     Math.pow(e.y, 2)
@@ -198,10 +198,10 @@ const distance (e) =>
 <p>We can now implement our "too far" rule, first scaling and limiting the distance so that it's a bit handier to play with.</p>
 
 <pre><code class="language-javascript">
-const scale = (d) => d / 300
+const scale = (d) =&gt; d / 300
 const limit = Math.min.bind(null, 1)
 
-const tooFar = (s) => s >= 1
+const tooFar = (s) =&gt; s &gt;= 1
 
 /*<span data-key="move_graph"><span id="move_graph_text">
 * scaled: _
@@ -224,11 +224,11 @@ const tooFar = (s) => s >= 1
 
 
 <pre><code class="language-javascript" data-key="colour_calculation">// map [0,1] to [120,0]
-const hue = d => (1-d) * 120
+const hue = d =&gt; (1-d) * 120
 
 // generate a css colour
 const colour =
-  d => `hsl(${Math.floor(hue(d))}, 100%, 45%)`
+  d =&gt; `hsl(${Math.floor(hue(d))}, 100%, 45%)`
 
 /*
 * <span id="colour_calculation_colour">_</span>
@@ -277,7 +277,7 @@ const colour =
 
 <pre><code class="language-javascript">const PI2 = 2 * Math.PI
 
-const convert = p => ({
+const convert = p =&gt; ({
     alpha: Math.sin(PI2 * (p.alpha / 180)),
     beta:  Math.sin(PI2 * (p.beta  / 360)),
     gamma: Math.sin(PI2 * (p.gamma / 360))
